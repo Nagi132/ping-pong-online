@@ -1,12 +1,8 @@
 import './App.css';
-import TitleScreen from './TitleScreen';
+import { Canvas } from './Canvas.js';
 
-function App() {
+export default function App() {
   return (
-    <div className="App">
-      <TitleScreen/>
-    </div>
+    <Canvas width={500} height={500} />
   );
 }
-
-export default App;
