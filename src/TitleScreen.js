@@ -19,6 +19,7 @@ function TitleScreen () {
       
         <div className="App-header">
 
+          {/* play button with embedded link */}
           <Link to={`../Gameplay`}><button className="button">Play!</button></Link>
           
           
