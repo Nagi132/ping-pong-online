@@ -1,11 +1,39 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
+import * as React from "react";
+import * as ReactDOM from "react-dom/client";
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
+
+import {
+  createBrowserRouter,
+  RouterProvider,
+} from "react-router-dom";
+
+import "./index.css";
+import TitleScreen from "./TitleScreen";
+import Gameplay from './Gameplay';
+
+const router = createBrowserRouter([
+  //add more routes to pages here
+
+  // {
+  //   path: "/Root",
+  //   element: <Root />,
+  // },
+
+  //default route "/" is titlescreen
+  {
+    path: "/",
+    element: <TitleScreen />,
+  },
+
+  {
+    path: "/Gameplay",
+    element: <Gameplay />,
+  },
+
+]);
+
+ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
-    <App />
+    <RouterProvider router={router} />
   </React.StrictMode>
 );

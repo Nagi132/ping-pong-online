@@ -1,20 +1,8 @@
 import './TitleScreen.css';
-import Canvas from './Canvas';
+import Gameplay from './Gameplay';
+import { Outlet, Link } from "react-router-dom";
 
 
-
-function Button () {
-
-  function handleClick() {
-    console.log('You started the game.');
-  }
-
-  return (
-    <div>
-      <button className="button" onClick={handleClick}>Play!</button>
-    </div>
-  );
-}
 
 function TitleScreen () {
   return (
@@ -30,7 +18,10 @@ function TitleScreen () {
       <div className="App-background">
       
         <div className="App-header">
-          <Button/> 
+
+          <Link to={`../Gameplay`}><button className="button">Play!</button></Link>
+          
+          
         
           
         </div>
