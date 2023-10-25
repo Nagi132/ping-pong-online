@@ -1,5 +1,4 @@
 import './TitleScreen.css';
-import Gameplay from './Gameplay';
 import { Outlet, Link } from "react-router-dom";
 
 
@@ -21,8 +20,6 @@ function TitleScreen () {
 
           {/* play button with embedded link */}
           <Link to={`../Gameplay`}><button className="button">Play!</button></Link>
-          
-          
         
           
         </div>

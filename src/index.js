@@ -1,7 +1,6 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom/client";
 
-
 import {
   createBrowserRouter,
   RouterProvider,
@@ -9,7 +8,7 @@ import {
 
 import "./index.css";
 import TitleScreen from "./TitleScreen";
-import Gameplay from './Gameplay';
+import Gameplay from "./Gameplay";
 
 const router = createBrowserRouter([
   //add more routes to pages here
