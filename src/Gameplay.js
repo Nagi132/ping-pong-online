@@ -67,10 +67,18 @@ const Gameplay = () => {
         setBallSpeedX(-ballSpeedX);        
     }
 
+    //moves based on ball position
     function computerMovement() {
         let paddle2YCenter = paddle2Y + (PADDLE_HEIGHT/2);     
             if(paddle2YCenter < ballY - 50) setPaddle2Y(paddle2Y+10);
             else if (paddle2YCenter > ballY + 50) setPaddle2Y(paddle2Y-10);
+    }
+
+    //moves based on keyboard input
+    function playerMovement() {
+        let paddle1YCenter = paddle1Y + (PADDLE_HEIGHT/2);     
+            if(paddle1YCenter < ballY - 50) setPaddle1Y(paddle1Y+10);
+            else if (paddle1YCenter > ballY + 50) setPaddle1Y(paddle1Y-10);
     }
 
     useLayoutEffect(() => {
@@ -108,15 +116,19 @@ const Gameplay = () => {
         
         ballMovement();
         computerMovement();
+        playerMovement();
              
     },[counter])
 
     return (
     <div className="container">  
+
       {/* back button */}
       <div className="back">
-          <Link to={`../`}><button className="button">Quit</button></Link>
+          <Link to={`../GameplayMenu`}><button className="button">Quit</button></Link>
       </div>
+
+      {/* gameplay */}
       <canvas ref={canvasRef} width={TABLE_WIDTH} height={TABLE_HEIGHT}/>
     </div>
     );

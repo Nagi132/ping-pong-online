@@ -1,6 +1,20 @@
 
 
-.App-background {
+.background-menu{
+  /* opacity: 0.1; */
+  background-image: url("images/MenuScreen.jpg");
+  background-color: rgba(0, 0, 139, 0.5);
+  background-repeat: no-repeat;
+  background-position: center; 
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* z-index: -1; */
+}
+
+.background-title {
   /* opacity: 0.1; */
   background-image: url("images/title.png");
   background-color: rgba(0, 0, 139, 0.5);
@@ -90,4 +104,5 @@ footer{
   display: inline-block;
   font-size: 16px;
   border-radius: 10px;
+  border: 1px solid white;
 }

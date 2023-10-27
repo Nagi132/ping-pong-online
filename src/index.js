@@ -9,6 +9,7 @@ import {
 import "./index.css";
 import TitleScreen from "./TitleScreen";
 import Gameplay from "./Gameplay";
+import GameplayMenu from "./GameplayMenu";
 
 const router = createBrowserRouter([
   //add more routes to pages here
@@ -24,6 +25,10 @@ const router = createBrowserRouter([
     element: <TitleScreen />,
   },
 
+  {
+    path: "/GameplayMenu",
+    element: <GameplayMenu />,
+  },
   {
     path: "/Gameplay",
     element: <Gameplay />,
