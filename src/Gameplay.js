@@ -14,8 +14,8 @@ const Gameplay = () => {
 
     const [ballX, setBallX] = useState(500);
     const [ballY, setBallY] = useState(300);
-    const [ballSpeedX, setBallSpeedX] = useState(0);
-    const [ballSpeedY, setBallSpeedY] = useState(0);
+    const [ballSpeedX, setBallSpeedX] = useState(10);
+    const [ballSpeedY, setBallSpeedY] = useState(10);
 
     // Variables for paddle
     const [paddle1Y, setPaddle1Y] = useState(350);
@@ -28,12 +28,10 @@ const Gameplay = () => {
     const WINNING_SCORE = 3;
     let winner = false;
 
-    const movement = () => {
+    const ballMovement = () => {
         if(winner) return;
-        setBallSpeedX(7);
-        setBallSpeedY(5);
-        setBallX(x => x += ballSpeedX);
-        setBallY(y => y += ballSpeedY);
+        setBallX(x => x += ballSpeedX * 0.75);
+        setBallY(y => y += ballSpeedY * 0.75);
 
         if(ballX <= 10) {
             if(ballY > paddle1Y && ballY < paddle1Y+PADDLE_HEIGHT) {
@@ -46,18 +44,18 @@ const Gameplay = () => {
                 ballReset();
             }
         }
-        if(ballX >= 1000) {
+        if(ballX >= 990) {
             if(ballY > paddle2Y && ballY < paddle2Y+PADDLE_HEIGHT) {
                 setBallSpeedX(-ballSpeedX);
                 let deltaY = ballY - (paddle2Y+PADDLE_HEIGHT/2);
                 setBallSpeedY(deltaY * 0.35);
             }
             else {
-                player1Score++; // must be before ballReset()
+                player1Score++; 
                 ballReset();
             }
         }
-        if(ballY < 0 || ballY > 600) {
+        if(ballY + ballSpeedY < 10 || ballY + ballSpeedY > 590) {
             setBallSpeedY(-ballSpeedY); 
         }
     };
@@ -69,8 +67,14 @@ const Gameplay = () => {
         setBallSpeedX(-ballSpeedX);        
     }
 
+    function computerMovement() {
+        let paddle2YCenter = paddle2Y + (PADDLE_HEIGHT/2);     
+            if(paddle2YCenter < ballY - 50) setPaddle2Y(paddle2Y+10);
+            else if (paddle2YCenter > ballY + 50) setPaddle2Y(paddle2Y-10);
+    }
+
     useLayoutEffect(() => {
-        let timerId
+        let timerId;
         const animate = () => {                
             setCounter(c => c + 1)
             timerId = requestAnimationFrame(animate)
@@ -102,7 +106,8 @@ const Gameplay = () => {
         context.arc(TABLE_WIDTH+ballX, TABLE_HEIGHT+ballY, 10, 0, Math.PI*2, true);
         context.fill();
         
-        movement();
+        ballMovement();
+        computerMovement();
              
     },[counter])
 
