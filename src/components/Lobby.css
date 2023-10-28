@@ -1,0 +1,61 @@
+.lobby-background {
+    /* background-image: url("../images/title.png"); */
+    background-color: rgba(0, 0, 139, 0.5);
+    background-repeat: no-repeat;
+    background-position: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 20px;
+    height: auto;
+}
+
+.lobby-background>div:last-child {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-start;
+    /* This will space the buttons across the width of the container */
+    margin-top: 600px;
+}
+
+.lobby {
+    padding: 20px;
+    background-color: #f4f4f4;
+    border-radius: 5px;
+    width: 100%;
+}
+
+.lobby h2 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.lobby ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.game-lobby-header {
+    width: 50%;
+    background-color: rgb(0, 0, 0);
+    padding: 10px 0;
+    text-align: left;
+    display: flex;
+    justify-content: start;
+    align-items: center;
+}
+
+.game-lobby-title {
+    width: 50%;
+    font-size: 48px;
+    margin: 0;
+    color: white;
+    padding-left: 20px;
+}
+
+.lobby-list {
+    margin-top: 20px;
+    font-size: 24px;
+    text-align: left;
+    color: white
+}

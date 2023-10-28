@@ -1,15 +1,15 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom/client";
 
-
 import {
   createBrowserRouter,
   RouterProvider,
 } from "react-router-dom";
 
 import "./index.css";
-import TitleScreen from "./TitleScreen";
+import TitleScreen from "./components/TitleScreen";
 import Gameplay from './Gameplay';
+import Lobby from './components/Lobby';
 
 const router = createBrowserRouter([
   //add more routes to pages here
@@ -26,8 +26,13 @@ const router = createBrowserRouter([
   },
 
   {
-    path: "/Gameplay",
+    path: "/Gameplay/:playerName",
     element: <Gameplay />,
+  },
+
+  {
+    path: "/Lobby",
+    element: <Lobby />,
   },
 
 ]);

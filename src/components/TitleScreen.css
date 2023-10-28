@@ -1,11 +1,9 @@
-
-
-.App-background {
+.title-screen .App-background {
   /* opacity: 0.1; */
-  background-image: url("images/title.png");
+  background-image: url("../images/title.png");
   background-color: rgba(0, 0, 139, 0.5);
   background-repeat: no-repeat;
-  background-position: center; 
+  background-position: center;
   position: absolute;
   top: 0;
   left: 0;
@@ -14,11 +12,12 @@
   /* z-index: -1; */
 }
 
-.title-image {
+.title-screen .title-image {
   width: 1000px;
 }
+
 /* Add custom css styles here */
-h1 {
+.title-screen h1 {
   font-size: 40px;
   border-radius: 25px;
   padding: 10px;
@@ -30,7 +29,8 @@ h1 {
   font-size: 18px;
 
 }
-p.h1{
+
+.title-screen p.h1 {
   font-weight: bold;
   background-color: rgba(109, 54, 2, 0.658);
   margin: auto;
@@ -39,12 +39,14 @@ p.h1{
   text-align: center;
   font-size: 30px;
 }
-p{
+
+.title-screen p {
   font-size: 20px;
 }
-.App-header {
+
+.title-screen .App-header {
   font-size: 20px;
- 
+
   text-align: center;
   color: white;
 
@@ -52,36 +54,41 @@ p{
   width: 50%;
   padding: 30% 0% 0% 0%;
 
-  
-  
   background-size: cover;
 }
-h2{
+
+.title-screen h2 {
   text-align: center;
   font-size: 40px;
 }
 
-main{
+.title-screen main {
   background-color: bisque;
 }
-p.h2{
+
+.title-screen p.h2 {
   text-align: center;
   font-size: 30px;
 }
-.about{
-  background-color:rgb(236, 196, 162);
+
+.title-screen .about {
+  background-color: rgb(236, 196, 162);
 }
-.col{
+
+.title-screen .col {
   font-size: 25px;
 }
-footer{
-  background-color:rgb(137, 255, 222);
+
+.title-screen footer {
+  background-color: rgb(137, 255, 222);
   font-size: 25px;
   text-align: center;
 
 }
-.button {
-  background-color: #4CAF50; /* Green */
+
+.title-screen .button {
+  background-color: #4CAF50;
+  /* Green */
   border: none;
   color: white;
   padding: 15px 32px;
