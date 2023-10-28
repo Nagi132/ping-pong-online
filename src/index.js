@@ -10,6 +10,7 @@ import "./index.css";
 import TitleScreen from "./components/TitleScreen";
 import Gameplay from './Gameplay';
 import Lobby from './components/Lobby';
+import GameplayMenu from "./GameplayMenu";
 
 const router = createBrowserRouter([
   //add more routes to pages here
@@ -23,6 +24,10 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <TitleScreen />,
+  },
+
+  {
+    path: "/Gameplay/:playerName",
   },
 
   {
