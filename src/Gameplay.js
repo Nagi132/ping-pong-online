@@ -28,6 +28,8 @@ const Gameplay = () => {
     const PADDLE_HEIGHT = 100;
     const PADDLE_THICKNESS = 10;
 
+    const [mousePosition, setMousePosition] = useState({x: null, y: null});
+
     // player scoring; winning score is 3
     const [player1Score, setPlayer1Score] = useState(0);
     const [player2Score, setPlayer2Score] = useState(0);
@@ -83,16 +85,9 @@ const Gameplay = () => {
 
     //moves based on ball position
     const computerMovement = () => {
-        let paddle2YCenter = paddle2Y + (PADDLE_HEIGHT/2);     
-            if(paddle2YCenter < ballY - 75) setPaddle2Y(paddle2Y+10);
-            else if (paddle2YCenter > ballY + 75) setPaddle2Y(paddle2Y-10);
-    }
-
-    //moves based on keyboard input
-    const playerMovement = () => {
-        let paddle1YCenter = paddle1Y + (PADDLE_HEIGHT/2);     
-            if(paddle1YCenter < ballY - 50) setPaddle1Y(paddle1Y+10);
-            else if (paddle1YCenter > ballY + 50) setPaddle1Y(paddle1Y-10);
+        let paddle2YCenter = paddle2Y + (PADDLE_HEIGHT/2); 
+        if(paddle2YCenter < ballY - 50) setPaddle2Y(paddle2Y+10);
+        else if (paddle2YCenter > ballY + 50) setPaddle2Y(paddle2Y-10);
     }
 
     // used to animate canvas and sets frame counter
@@ -135,7 +130,16 @@ const Gameplay = () => {
         // movement functions
         ballMovement();
         computerMovement();
-        playerMovement();
+
+        // player movement
+        const updateMousePosition = event => {
+            setMousePosition({ x: event.clientX, y: event.clientY });
+            if(mousePosition.y > 155 && mousePosition.y < 660 ) setPaddle1Y(mousePosition.y - (PADDLE_HEIGHT/2));
+        };
+        canvas.addEventListener('mousemove', updateMousePosition);
+        return () => {
+            canvas.removeEventListener('mousemove', updateMousePosition);
+        };
              
     },[counter])
 
