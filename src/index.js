@@ -27,7 +27,8 @@ const router = createBrowserRouter([
   },
 
   {
-    path: "/Gameplay/:playerName",
+    path: "/GameplayMenu",
+    element: <GameplayMenu />,
   },
 
   {

@@ -15,13 +15,13 @@ function Lobby() {
 
                 <div className="player-section">
                     <h2 className="lobby-list">LOBBY LIST:</h2>
-                    <ul>
+                    <div className="player-container">
                         {players.map(player => (
-                            <li key={player}>
-                                <Link to={'/Gameplay/${player}'}>{player}'s Lobby</Link>
-                            </li>
+                            <div key={player} className="player">
+                                <Link to={`/Gameplay/${player}`}>{player}'s Lobby</Link>
+                            </div>
                         ))}
-                    </ul>
+                    </div>
                 </div>
 
                 <div className="d-flex justify-content-between mt-5">
