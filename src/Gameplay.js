@@ -19,8 +19,8 @@ const Gameplay = () => {
     // ball x and y positions; vertical and horizontaly speed
     const [ballX, setBallX] = useState(500);
     const [ballY, setBallY] = useState(300);
-    const [ballSpeedX, setBallSpeedX] = useState(10);
-    const [ballSpeedY, setBallSpeedY] = useState(10);
+    const [ballSpeedX, setBallSpeedX] = useState(15);
+    const [ballSpeedY, setBallSpeedY] = useState(15);
 
     // paddles for player 1 and 2; constant paddle size
     const [paddle1Y, setPaddle1Y] = useState(350);
@@ -28,56 +28,52 @@ const Gameplay = () => {
     const PADDLE_HEIGHT = 100;
     const PADDLE_THICKNESS = 10;
 
+    // mouse movement
     const [mousePosition, setMousePosition] = useState({x: null, y: null});
 
     // player scoring; winning score is 3
     const [player1Score, setPlayer1Score] = useState(0);
     const [player2Score, setPlayer2Score] = useState(0);
-    const WINNING_SCORE = 3;
-    let winner = false;
+    const [winner, setWinner] = useState(false);
+    const WINNING_SCORE = 2;
 
     // function for ball movement
     const ballMovement = () => {
-        if(winner) return;
         // sets ball velocity
         setBallX(x => x += ballSpeedX * 0.75);
         setBallY(y => y += ballSpeedY * 0.75);
-
-        // when ball reaches left side of screen
-        if(ballX <= 20) {
-            if(ballY > paddle1Y && ballY < paddle1Y+PADDLE_HEIGHT) { // paddle collision
-                // set ball in reverse direction
-                setBallSpeedX(-ballSpeedX);
-                let deltaY = ballY- (paddle1Y+PADDLE_HEIGHT/2);
-                setBallSpeedY(deltaY * 0.35);
-            } 
-            else { // wall collision
-                setPlayer2Score(p2score => p2score += 1); // must be before ballReset()
-                ballReset();
-            }
-        }
-        // when ball reaches right side of screen
-        if(ballX >= 980) {
-            if(ballY > paddle2Y && ballY < paddle2Y+PADDLE_HEIGHT) { // paddle collision
-                // set ball in reverse direction
-                setBallSpeedX(-ballSpeedX);
-                let deltaY = ballY - (paddle2Y+PADDLE_HEIGHT/2);
-                setBallSpeedY(deltaY * 0.35);
-            }
-            else { // wall collision
-                setPlayer1Score(p1score => p1score += 1); 
-                ballReset();
-            }
-        }
+    };
+    const collision = () => { 
         // when ball reaches top or bottom of screen, reverse direction
         if(ballY + ballSpeedY < 10 || ballY + ballSpeedY > 590) {
             setBallSpeedY(-ballSpeedY); 
         }
-    };
+
+        if (ballX < 20 && ballY + 110 > paddle1Y && ballY < paddle1Y) {
+            setBallX(x => x + 20);
+            setBallSpeedX(-ballSpeedX);
+            let deltaY = ballY - (paddle1Y+PADDLE_HEIGHT/2);
+            setBallSpeedY(y => deltaY * .05);
+        }
+        else if (ballX <= 10){
+            setPlayer2Score(s => s + 1);
+            ballReset();
+        }
+        if (ballX > 990 && ballY + 110 > paddle2Y && ballY < paddle2Y) {
+            setBallX(x => x - 20);
+            setBallSpeedX(-ballSpeedX);
+            let deltaY = ballY - (paddle2Y+PADDLE_HEIGHT/2);
+            setBallSpeedY(y => deltaY * .05);
+        }
+        else if(ballX >= 990){
+            setPlayer1Score(s => s + 1);
+            ballReset();
+        } 
+    }
     // when wall collision occurs
     const ballReset = () => {
         // check for winner
-        if(player1Score >= WINNING_SCORE || player2Score >= WINNING_SCORE) winner = true;
+        if(player1Score === WINNING_SCORE || player2Score === WINNING_SCORE) setWinner(true);
         setBallX(500);
         setBallY(300);
         setBallSpeedX(-ballSpeedX);        
@@ -85,9 +81,8 @@ const Gameplay = () => {
 
     //moves based on ball position
     const computerMovement = () => {
-        let paddle2YCenter = paddle2Y + (PADDLE_HEIGHT/2); 
-        if(paddle2YCenter < ballY - 50) setPaddle2Y(paddle2Y+10);
-        else if (paddle2YCenter > ballY + 50) setPaddle2Y(paddle2Y-10);
+        if(paddle2Y < ballY - 75) setPaddle2Y(y => y + 15);
+        else if (paddle2Y > ballY + 75) setPaddle2Y(y => y - 15);;
     }
 
     // used to animate canvas and sets frame counter
@@ -96,10 +91,11 @@ const Gameplay = () => {
         const animate = () => {                
             setCounter(c => c + 1)
             timerId = requestAnimationFrame(animate)
-        }
+        };
         timerId = requestAnimationFrame(animate)
+        if(winner) cancelAnimationFrame(timerId)
         return () => cancelAnimationFrame(timerId)
-    }, [])
+    }, [winner])
 
     // draw canvas
     useEffect(() => {
@@ -126,10 +122,11 @@ const Gameplay = () => {
         context.beginPath();
         context.arc(TABLE_WIDTH+ballX, TABLE_HEIGHT+ballY, 10, 0, Math.PI*2, true);
         context.fill();
-        
+
         // movement functions
         ballMovement();
         computerMovement();
+        collision();
 
         // player movement
         const updateMousePosition = event => {
@@ -149,9 +146,13 @@ const Gameplay = () => {
       <div className="back">
           <Link to={`../GameplayMenu`}><button className="button">Quit</button></Link>
       </div>
-
+      <div className='score'>
+        <h1>{player1Score}</h1>
+        <h1>{player2Score}</h1> 
+      </div>
+      <h2 className='winner'> {winner ? 'Game over!' : ''} </h2>
       {/* gameplay */}
-      <canvas ref={canvasRef} width={TABLE_WIDTH} height={TABLE_HEIGHT}/>
+      <canvas ref={canvasRef}/>
     </div>
     );
 }
