@@ -81,11 +81,27 @@ const Gameplay = () => {
         setBallSpeedX(-ballSpeedX);        
     }
 
-    //moves based on ball position
+    //computer movement
     const computerMovement = () => {
-        if(paddle2Y < ballY - 50) setPaddle2Y(y => y + 15);
-        else if (paddle2Y > ballY + 50) setPaddle2Y(y => y - 15);
+        //speeds up from long range
+        if(paddle2Y < ballY - 100) setPaddle2Y(y => y + 50 * (Math.random() + 1));
+        //slow at close range
+        else if(paddle2Y < ballY - 50) setPaddle2Y(y => y + 15 * (Math.random() + 1));
+        
+        
+        //opposite directions
+
+        else if (paddle2Y > ballY + 100) setPaddle2Y(y => y - 50 * (Math.random() + 1));
+
+        else if (paddle2Y > ballY + 50) setPaddle2Y(y => y - 15 * (Math.random() + 1));
+
+       
+
+        // harder difficulty
+        // if(paddle2Y < ballY - 50) setPaddle2Y(y => y + 20 * Math.random());
+        // else if (paddle2Y > ballY + 50) setPaddle2Y(y => y - 20 * Math.random());
     }
+    
 
     // used to animate canvas and sets frame counter
     useLayoutEffect(() => {
@@ -147,7 +163,7 @@ const Gameplay = () => {
     <div className="container">  
       {/* back button */}
       <div className="back">
-          <Link to={`../GameplayMenu`}><button className="button">Quit</button></Link>
+          <Link to={`../Lobby`}><button className="button">Quit</button></Link>
       </div>
       <div className='score'>
         <h1>{player1Score}</h1>
