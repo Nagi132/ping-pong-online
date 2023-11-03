@@ -53,6 +53,8 @@ body {
 
 .player {
     font-size: 1.4em;
+    color: white;
+    text-decoration: none;
     background-color: rgba(255, 255, 255, 0.7);
     margin-bottom: 10px;
     text-align: left;
@@ -82,4 +84,14 @@ body {
 
 .btn-create-lobby {
     background-color: blue; 
+}
+
+.player a, .player a:visited {
+    color: white ; 
+    text-decoration: none ;
+}
+
+.player a:hover, .player a:focus {
+    color: #ccc;
+    text-decoration: underline;
 }
