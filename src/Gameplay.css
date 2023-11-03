@@ -1,10 +1,11 @@
 .container {
   overflow-y: hidden;
+  height: 100vh;
   background-color: #8E8673;
 }
 
 .score {
-  margin-top: 50px;
+  margin-top: 10px;
   display: flex;
   flex-direction: row;
   justify-content: space-around;

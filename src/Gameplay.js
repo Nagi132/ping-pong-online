@@ -13,8 +13,10 @@ const Gameplay = () => {
     const [counter, setCounter] = useState(0);
 
     // table width and height relative to window dimensions
-    const TABLE_WIDTH = window.innerWidth/2 - 500;
-    const TABLE_HEIGHT = window.innerHeight/2 - 300;
+    const START_WIDTH = window.innerWidth/2 - 500;
+    const START_HEIGHT = window.innerHeight/2 - 300;
+    const TABLE_WIDTH = 1000;
+    const TABLE_HEIGHT = 600
 
     // ball x and y positions; vertical and horizontaly speed
     const [ballX, setBallX] = useState(500);
@@ -45,7 +47,7 @@ const Gameplay = () => {
     };
     const collision = () => { 
         // when ball reaches top or bottom of screen, reverse direction
-        if(ballY + ballSpeedY < 10 || ballY + ballSpeedY > 590) {
+        if(ballY + ballSpeedY < -100 || ballY + ballSpeedY > TABLE_HEIGHT-120) {
             setBallSpeedY(-ballSpeedY); 
         }
 
@@ -53,19 +55,19 @@ const Gameplay = () => {
             setBallX(x => x + 20);
             setBallSpeedX(-ballSpeedX);
             let deltaY = ballY - (paddle1Y+PADDLE_HEIGHT/2);
-            setBallSpeedY(y => deltaY * .05);
+            setBallSpeedY(y => deltaY * -.05);
         }
         else if (ballX <= 10){
             setPlayer2Score(s => s + 1);
             ballReset();
         }
-        if (ballX > 990 && ballY + 110 > paddle2Y && ballY < paddle2Y) {
+        if (ballX > TABLE_WIDTH-10 && ballY + 110 > paddle2Y && ballY < paddle2Y) {
             setBallX(x => x - 20);
             setBallSpeedX(-ballSpeedX);
             let deltaY = ballY - (paddle2Y+PADDLE_HEIGHT/2);
             setBallSpeedY(y => deltaY * .05);
         }
-        else if(ballX >= 990){
+        else if(ballX >= TABLE_WIDTH-10){
             setPlayer1Score(s => s + 1);
             ballReset();
         } 
@@ -81,8 +83,8 @@ const Gameplay = () => {
 
     //moves based on ball position
     const computerMovement = () => {
-        if(paddle2Y < ballY - 75) setPaddle2Y(y => y + 15);
-        else if (paddle2Y > ballY + 75) setPaddle2Y(y => y - 15);;
+        if(paddle2Y < ballY - 50) setPaddle2Y(y => y + 15);
+        else if (paddle2Y > ballY + 50) setPaddle2Y(y => y - 15);
     }
 
     // used to animate canvas and sets frame counter
@@ -102,25 +104,25 @@ const Gameplay = () => {
         // gets canvas and context to use
         const canvas = canvasRef.current;
         const context = canvas.getContext('2d');
-        context.canvas.height = window.innerHeight;
+        context.canvas.height = TABLE_HEIGHT;
         context.canvas.width = window.innerWidth;
 
         // creates green table
         context.fillStyle = '#00A650';
-        context.fillRect(TABLE_WIDTH, TABLE_HEIGHT, 1000, 600);
+        context.fillRect(START_WIDTH, 0, TABLE_WIDTH, TABLE_HEIGHT);
 
         context.fillStyle = '#FFFFFF';
         // net
-        for(let i = TABLE_HEIGHT; i < window.innerHeight - TABLE_HEIGHT; i+=30){
-            context.fillRect(TABLE_WIDTH+500, i, 2, 25);
+        for(let i = 0; i < window.innerHeight - 225; i+=30){
+            context.fillRect(START_WIDTH+500, i, 2, 25);
         } 
         // left player paddle
-        context.fillRect(TABLE_WIDTH, paddle1Y, PADDLE_THICKNESS, PADDLE_HEIGHT);
+        context.fillRect(START_WIDTH, paddle1Y, PADDLE_THICKNESS, PADDLE_HEIGHT);
         // right CPU paddle
-        context.fillRect(window.innerWidth-TABLE_WIDTH-PADDLE_THICKNESS, paddle2Y, PADDLE_THICKNESS, PADDLE_HEIGHT);
+        context.fillRect(window.innerWidth-START_WIDTH-PADDLE_THICKNESS, paddle2Y, PADDLE_THICKNESS, PADDLE_HEIGHT);
         // draws ball
         context.beginPath();
-        context.arc(TABLE_WIDTH+ballX, TABLE_HEIGHT+ballY, 10, 0, Math.PI*2, true);
+        context.arc(START_WIDTH+ballX, START_HEIGHT+ballY, 10, 0, Math.PI*2, true);
         context.fill();
 
         // movement functions
@@ -130,8 +132,9 @@ const Gameplay = () => {
 
         // player movement
         const updateMousePosition = event => {
-            setMousePosition({ x: event.clientX, y: event.clientY });
-            if(mousePosition.y > 155 && mousePosition.y < 660 ) setPaddle1Y(mousePosition.y - (PADDLE_HEIGHT/2));
+            let rect = canvas.getBoundingClientRect();
+            setMousePosition({x: event.clientX - rect.left, y: event.clientY - rect.top})
+            if(mousePosition.y > 0 && mousePosition.y < TABLE_HEIGHT ) setPaddle1Y(mousePosition.y - (PADDLE_HEIGHT/2));
         };
         canvas.addEventListener('mousemove', updateMousePosition);
         return () => {
@@ -148,9 +151,9 @@ const Gameplay = () => {
       </div>
       <div className='score'>
         <h1>{player1Score}</h1>
+        <h2 className='winner'> {winner ? 'Game over!' : ''} </h2>
         <h1>{player2Score}</h1> 
       </div>
-      <h2 className='winner'> {winner ? 'Game over!' : ''} </h2>
       {/* gameplay */}
       <canvas ref={canvasRef}/>
     </div>
