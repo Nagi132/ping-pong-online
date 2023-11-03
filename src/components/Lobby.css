@@ -1,73 +1,85 @@
-.lobby-background {
-    /* background-image: url("../images/title.png"); */
+body {
     background-color: rgba(0, 0, 139, 0.5);
-    background-repeat: no-repeat;
-    background-position: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding: 20px;
-    height: auto;
-}
-
-.lobby-background>div:last-child {
-    justify-content: flex-start;
-    margin-top: 500px;
-
-}
-
-.lobby {
-    padding: 20px;
-    background-color: #f4f4f4;
-    border-radius: 5px;
+    margin: 0;
+    height: 100%;
     width: 100%;
 }
 
-.lobby h2 {
-    text-align: center;
-    margin-bottom: 20px;
+.container-fluid {
+    display: flex;
+    justify-content: center;
+    align-items: start;
+    height: 100%;
+    padding-top: 50px;
 }
 
-.lobby ul {
-    list-style-type: none;
-    padding: 0;
+.lobby-background {
+    background-image: url("../images/MenuScreen.jpg");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 185px;
+    width: 100%;
+    max-width: 900px;
+    position:relative;
 }
 
 .game-lobby-header {
-    width: 50%;
-    background-color: rgb(0, 0, 0);
-    padding: 10px 0;
-    text-align: left;
-    display: flex;
-    justify-content: start;
-    align-items: center;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 1.5em;
+    color:white;
 }
 
-.game-lobby-title {
-    width: 50%;
-    font-size: 48px;
-    margin: 0;
-    color: white;
-    padding-left: 20px;
-}
-
-.lobby-list {
-    margin-top: 20px;
-    font-size: 24px;
-    text-align: left;
-    color: white
+.player-section {
+    font-size: 1.2em;
+    width: 100%;
+    text-align: center;
 }
 
 .player-container {
-    width: 500px; 
-    max-height: 100px; 
-    background-color: white;
+    margin: 0 auto;
+    background-color: rgba(0, 0, 0, 0.5);
     overflow-y: auto;
     padding: 10px;
-   
     border-radius: 20px;
+    width: 50%;
+    max-height: 500px;
 }
 
 .player {
+    font-size: 1.4em;
+    background-color: rgba(255, 255, 255, 0.7);
     margin-bottom: 10px;
+    text-align: left;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+/*Button styling*/
+.btn {
+    padding: 20px 50px; 
+    font-size: 2em; 
+    color: #fff; 
+    background-color: #007bff;
+    border: none; 
+    border-radius: 10px; 
+    cursor: pointer; 
+    transition: background-color 0.3s ease;
+}
+.btn:hover {
+    background-color: #0056b3; 
+}
+
+.btn-home {
+    margin: 20px;
+    background-color: red; 
+}
+
+.btn-create-lobby {
+    background-color: blue; 
 }

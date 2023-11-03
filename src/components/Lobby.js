@@ -26,9 +26,9 @@ function Lobby() {
 
                 <div className="d-flex justify-content-between mt-5">
                     <Link to="/">
-                        <button className="btn btn-primary">HOME</button>
+                        <button className="btn btn-home">HOME</button>
                     </Link>
-                    <button className="btn btn-success">CREATE LOBBY</button>
+                    <button className="btn btn-create-lobby">CREATE LOBBY</button>
                 </div>
             </div>
         </div>
