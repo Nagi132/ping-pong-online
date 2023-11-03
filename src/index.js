@@ -1,50 +1,57 @@
-import * as React from "react";
-import * as ReactDOM from "react-dom/client";
-
-import {
-  createBrowserRouter,
-  RouterProvider,
-} from "react-router-dom";
-
+import React, { useEffect } from "react";
+import ReactDOM from "react-dom/client";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./index.css";
 import TitleScreen from "./components/TitleScreen";
 import Gameplay from './Gameplay';
 import Lobby from './components/Lobby';
 import GameplayMenu from "./GameplayMenu";
+import io from 'socket.io-client';
 
-const router = createBrowserRouter([
-  //add more routes to pages here
+const socket = io('http://localhost:4000'); // Connects to socket.io server
 
-  // {
-  //   path: "/Root",
-  //   element: <Root />,
-  // },
+function App() {
+  useEffect(() => {
+    socket.on('connect', () => {
+      console.log('Connected to the server');
+    });
 
-  //default route "/" is titlescreen
-  {
-    path: "/",
-    element: <TitleScreen />,
-  },
+    // Cleanup function for disconnecting from the server
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
 
-  {
-    path: "/GameplayMenu",
-    element: <GameplayMenu />,
-  },
+  const router = createBrowserRouter([
+    {
+      path: "/",
+      element: <TitleScreen />,
+    },
+    {
+      path: "/GameplayMenu",
+      element: <GameplayMenu />,
+    },
+    {
+      path: "/Gameplay/:playerName",
+      element: <Gameplay />,
+    },
+    {
+      path: "/Lobby",
+      element: <Lobby />,
+    },
+  ]);
 
-  {
-    path: "/Gameplay/:playerName",
-    element: <Gameplay />,
-  },
-
-  {
-    path: "/Lobby",
-    element: <Lobby />,
-  },
-
-]);
-
-ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
+  return (
     <RouterProvider router={router} />
+  );
+}
+
+// Get the root element from the document
+const rootElement = document.getElementById("root");
+const root = ReactDOM.createRoot(rootElement);
+
+root.render(
+  <React.StrictMode>
+    <App />
   </React.StrictMode>
 );

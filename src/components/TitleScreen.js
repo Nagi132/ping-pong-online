@@ -1,7 +1,6 @@
 import './TitleScreen.css';
 import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
-import Lobby from './Lobby';
 
 function TitleScreen() {
   const [username, setUsername] = useState("");
@@ -9,7 +8,7 @@ function TitleScreen() {
 
   const handlePlay = () => {
     if (username) {
-      navigate("/Lobby"); // Navigate to the lobby route
+      navigate("/Lobby", { state: { username } }); // Pass username to Lobby
     } else {
       alert("Please enter a username.");
     }
@@ -25,19 +24,19 @@ function TitleScreen() {
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossOrigin="anonymous"></link>
       </head>
       <div className="title-screen">
-      <div className="App-background">
-        <div className="App-header">
-          <label htmlFor="username">Enter Username:</label>
-          <input
-            type="text"
-            id="username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            placeholder="Username"
-          />
-          <button className="button" onClick={handlePlay}>Play!</button>
+        <div className="App-background">
+          <div className="App-header">
+            <label htmlFor="username">Enter Username:</label>
+            <input
+              type="text"
+              id="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Username"
+            />
+            <button className="button" onClick={handlePlay}>Play!</button>
+          </div>
         </div>
-      </div>
       </div>
     </>
   );
