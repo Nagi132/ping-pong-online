@@ -4,6 +4,15 @@
   background-color: #8E8673;
 }
 
+#canvas-container {
+  width: 100%;
+  text-align:center;
+}
+
+canvas {
+  display: inline;
+}
+
 .score {
   margin-top: 10px;
   display: flex;
