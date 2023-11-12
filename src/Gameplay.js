@@ -9,12 +9,13 @@ const Gameplay = () => {
     // set up canvas 
     const canvasRef = useRef();
 
+    // set replay button
+    const buttonReplay = useRef();
+
     // frame counter
     const [counter, setCounter] = useState(0);
 
     // table width and height
-    // const START_WIDTH = window.innerWidth/2 - 500;
-    // const START_HEIGHT = window.innerHeight/2 - 300;
     const TABLE_WIDTH = 1000;
     const TABLE_HEIGHT = 600
 
@@ -37,13 +38,13 @@ const Gameplay = () => {
     const [player1Score, setPlayer1Score] = useState(0);
     const [player2Score, setPlayer2Score] = useState(0);
     const [winner, setWinner] = useState(false);
-    const WINNING_SCORE = 5;
+    const WINNING_SCORE = 3;
 
     // function for ball movement
     const ballMovement = () => {
         // sets ball velocity
-        setBallX(x => x += ballSpeedX * 0.75);
-        setBallY(y => y += ballSpeedY * 0.75);
+        setBallX(x => x += ballSpeedX * 0.65);
+        setBallY(y => y += ballSpeedY * 0.65);
     };
     const collision = () => { 
         // when ball reaches top or bottom of screen, reverse direction
@@ -56,30 +57,27 @@ const Gameplay = () => {
             setBallSpeedX(speedX => speedX * -1);
             let deltaY = ballY - (paddle1Y+PADDLE_HEIGHT/2);
             setBallSpeedY(deltaY * (Math.random() < 0.5 ? -.5 : .5));
- 
         }
-        else if (ballX <= 0){
-            setPlayer2Score(s => s + 1);
-            ballReset();
-        }
-        if (ballX > TABLE_WIDTH && ballY > paddle2Y && ballY < paddle2Y+PADDLE_HEIGHT) {
+        else if (ballX > TABLE_WIDTH && ballY > paddle2Y && ballY < paddle2Y+PADDLE_HEIGHT) {
             setBallX(x => x - 20);
             setBallSpeedX(speedX => speedX * -1);
             let deltaY = ballY - (paddle2Y+PADDLE_HEIGHT/2);
             setBallSpeedY(deltaY * (Math.random() < 0.5 ? -.5 : .5));
         }
-        else if(ballX >= TABLE_WIDTH){
+        else if (ballX < 0){
+            setPlayer2Score(s => s + 1);
+            ballReset();
+        }
+        else if(ballX > TABLE_WIDTH){
             setPlayer1Score(s => s + 1);
             ballReset();
         } 
     }
     // when wall collision occurs
     const ballReset = () => {
-        // check for winner
-        if(player1Score === WINNING_SCORE || player2Score === WINNING_SCORE) setWinner(true);
         setBallX(500);
         setBallY(300);
-        setBallSpeedX(-ballSpeedX);        
+        setBallSpeedX(-ballSpeedX);    
     }
 
     //computer movement
@@ -89,31 +87,35 @@ const Gameplay = () => {
         //slow at close range
         else if(paddle2Y < ballY - 50) setPaddle2Y(y => y + 15 * (Math.random() + 1));
         
-        
         //opposite directions
 
         else if (paddle2Y > ballY + 100) setPaddle2Y(y => y - 50 * (Math.random() + 1));
 
         else if (paddle2Y > ballY + 50) setPaddle2Y(y => y - 15 * (Math.random() + 1));
 
-       
-
         // harder difficulty
         // if(paddle2Y < ballY - 50) setPaddle2Y(y => y + 20 * Math.random());
         // else if (paddle2Y > ballY + 50) setPaddle2Y(y => y - 20 * Math.random());
     }
-    
+
+    const replay = () => {
+        if (winner) {
+            setPlayer1Score(0);
+            setPlayer2Score(0);
+            setWinner(false);
+        } 
+    }
 
     // used to animate canvas and sets frame counter
     useLayoutEffect(() => {
         let timerId;
         const animate = () => {                
-            setCounter(c => c + 1)
-            timerId = requestAnimationFrame(animate)
+            setCounter(c => c + 1);
+            timerId = requestAnimationFrame(animate);
+            if(winner) cancelAnimationFrame(timerId);
         };
-        timerId = requestAnimationFrame(animate)
-        if(winner) cancelAnimationFrame(timerId)
-        return () => cancelAnimationFrame(timerId)
+        timerId = requestAnimationFrame(animate);
+        return () => cancelAnimationFrame(timerId);
     }, [winner])
 
     // draw canvas
@@ -146,6 +148,7 @@ const Gameplay = () => {
         ballMovement();
         computerMovement();
         collision();
+        if(player1Score === WINNING_SCORE || player2Score === WINNING_SCORE) setWinner(true);
 
         // player movement
         const updateMousePosition = event => {
@@ -172,8 +175,11 @@ const Gameplay = () => {
         <h1>{player2Score}</h1> 
       </div>
       {/* gameplay */}
-      <div id="canvas-container">
+      <div className="canvas-container">
         <canvas ref={canvasRef}/>
+      </div>
+      <div className='replay'>
+        {winner && <button onClick={replay} ref={buttonReplay}>Replay?</button>}
       </div>
     </div>
     );
