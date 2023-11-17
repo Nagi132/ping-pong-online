@@ -4,6 +4,8 @@ import { Outlet, Link } from "react-router-dom";
 import './index.css';
 import './Gameplay.css';
 
+const {num} = require('./components/difiiculty.js');
+
 const Gameplay = () => {
 
     // set up canvas 
@@ -21,7 +23,27 @@ const Gameplay = () => {
 
 
     //ball speed and cpu speed modifier for difficulties
-    const speedmodifier = 0.43;
+    
+    var speedmodifier;
+    var accuracy;
+    if(num.dif == 0) {
+        speedmodifier = 0.30;
+        //cpu paddle accuracy (chance it will move)
+        accuracy = 0.3;
+    }
+       
+    else if(num.dif == 1) {
+        speedmodifier = 0.43;
+        //cpu paddle accuracy (chance it will move)
+        accuracy = 0.2;
+    }
+    if(num.dif == 2) {
+        speedmodifier = 0.7;
+        //cpu paddle accuracy (chance it will move)
+        accuracy = 0.1;
+    }
+
+    
 
     // ball x and y positions; vertical and horizontaly speed
     const [ballX, setBallX] = useState(500);
@@ -98,17 +120,19 @@ const Gameplay = () => {
         if(ballSpeedX >= 0 && ballX > 150){  
             //if the ball speed is really low a human being is more likely to track it, so random is set lower and speed is higher
             if(paddle2Y + 50 + 50  < ballY && Math.abs(ballSpeedY) < 10) 
-            setPaddle2Y(y => y += Math.abs(ballSpeedY) * 3 * speedmodifier / (1 + (0.2*Math.random())));
+            setPaddle2Y(y => y += Math.abs(ballSpeedY) * 3 * speedmodifier + 0.2 / (1 + (0.2*Math.random())));
             if(paddle2Y + 50 - 50  > ballY && Math.abs(ballSpeedY) < 10) 
-            setPaddle2Y(y => y += Math.abs(ballSpeedY) * 3 * -speedmodifier / (1 + (0.2*Math.random())));
+            setPaddle2Y(y => y += Math.abs(ballSpeedY) * 3 * -speedmodifier + 0.2 / (1 + (0.2*Math.random())));
 
             //paddle2Y + 50 is the center of the paddle, once the ballY is passed either edge of the paddle, adjust paddleY
             //to be within the edges of the paddle
             //if 
-            if(paddle2Y + 50 + 50  < ballY) 
-            setPaddle2Y(y => y += Math.abs(ballSpeedY) * speedmodifier / (1 + (0.4*Math.random())));
-            if(paddle2Y + 50 - 50  > ballY) 
-            setPaddle2Y(y => y += Math.abs(ballSpeedY) * -speedmodifier / (1 + (0.4*Math.random())));
+            if(paddle2Y + 50 + 50  < ballY && Math.random() > accuracy) 
+            setPaddle2Y(y => y += Math.abs(ballSpeedY) * speedmodifier + 0.2 / (1 + (accuracy *Math.random() + speedmodifier)));
+            if(paddle2Y + 50 - 50  > ballY && Math.random() > accuracy) 
+            setPaddle2Y(y => y += Math.abs(ballSpeedY)  * -speedmodifier + 0.2 / (1 + (accuracy *Math.random() + speedmodifier)));
+            
+            
 
             //stuff to test the cpu collision boxes: 
             //setPaddle2Y(ballY - 50); //moves the center of paddle to the center of the ball immediately
@@ -119,8 +143,13 @@ const Gameplay = () => {
 
 
         
-* Math.random());
-           setWinner(false);
+    }
+
+    const replay = () => {
+        if (winner) {
+            setPlayer1Score(0);
+            setPlayer2Score(0);
+            setWinner(false);
         } 
     }
 

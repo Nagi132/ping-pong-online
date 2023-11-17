@@ -12,6 +12,11 @@ body {
     height: 100%;
     padding-top: 50px;
 }
+.lobby-list {
+    -webkit-text-stroke-width: 1px;
+  -webkit-text-stroke-color: white;
+  font-size: 40px;
+}
 
 .lobby-background {
     background-image: url("../images/MenuScreen.jpg");
@@ -80,6 +85,10 @@ body {
 .btn-home {
     margin: 20px;
     background-color: red; 
+}
+.btn-vsCPU {
+    margin: 20px;
+    background-color: rgb(10, 183, 33); 
 }
 
 .btn-create-lobby {
