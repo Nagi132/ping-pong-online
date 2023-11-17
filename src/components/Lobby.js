@@ -34,6 +34,7 @@ function Lobby() {
         };
     }, []);
 
+    // Create a new lobby
     const handleCreateLobby = () => {
         console.log('Creating lobby for: ', username);
         const lobbyName = `${username}'s Lobby`;
@@ -44,6 +45,10 @@ function Lobby() {
                 console.log('Error creating lobby: ', response.message);
             }
         });
+    }
+
+    const handlePlayAgainstCPU = () => {
+        navigate('/Gameplay', { state: { mode: 'cpu' } });
     }
 
     return (
@@ -72,6 +77,9 @@ function Lobby() {
                         CREATE LOBBY
                     </button>
                 </div>
+                <button className="btn btn-vs-cpu" onClick={handlePlayAgainstCPU}>
+                    PLAY AGAINST CPU
+                </button>
             </div>
         </div>
     );

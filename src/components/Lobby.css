@@ -86,6 +86,10 @@ body {
     background-color: blue; 
 }
 
+.btn-vs-cpu {
+    background-color: purple; 
+}
+
 .player a, .player a:visited {
     color: white ; 
     text-decoration: none ;

@@ -32,7 +32,11 @@ function App() {
       element: <GameplayMenu />,
     },
     {
-      path: "/Gameplay/:playerName",
+      path: "/Gameplay/:playerName",//For multiplayer mode
+      element: <Gameplay />,
+    },
+    {
+      path: "/Gameplay",//For single player mode
       element: <Gameplay />,
     },
     {
