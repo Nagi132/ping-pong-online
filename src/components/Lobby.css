@@ -1,0 +1,97 @@
+body {
+    background-color: rgba(0, 0, 139, 0.5);
+    margin: 0;
+    height: 100%;
+    width: 100%;
+}
+
+.container-fluid {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    height: 100%;
+    padding-top: 50px;
+}
+
+.lobby-background {
+    background-image: url("../images/MenuScreen.jpg");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 185px;
+    width: 100%;
+    max-width: 900px;
+    position:relative;
+}
+
+.game-lobby-header {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 1.5em;
+    color:white;
+}
+
+.player-section {
+    font-size: 1.2em;
+    width: 100%;
+    text-align: center;
+}
+
+.player-container {
+    margin: 0 auto;
+    background-color: rgba(0, 0, 0, 0.5);
+    overflow-y: auto;
+    padding: 10px;
+    border-radius: 20px;
+    width: 50%;
+    max-height: 500px;
+}
+
+.player {
+    font-size: 1.4em;
+    color: white;
+    text-decoration: none;
+    background-color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 10px;
+    text-align: left;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+/*Button styling*/
+.btn {
+    padding: 20px 50px; 
+    font-size: 2em; 
+    color: #fff; 
+    background-color: #007bff;
+    border: none; 
+    border-radius: 10px; 
+    cursor: pointer; 
+    transition: background-color 0.3s ease;
+}
+.btn:hover {
+    background-color: #0056b3; 
+}
+
+.btn-home {
+    margin: 20px;
+    background-color: red; 
+}
+
+.btn-create-lobby {
+    background-color: blue; 
+}
+
+.player a, .player a:visited {
+    color: white ; 
+    text-decoration: none ;
+}
+
+.player a:hover, .player a:focus {
+    color: #ccc;
+    text-decoration: underline;
+}
