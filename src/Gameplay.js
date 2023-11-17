@@ -17,11 +17,7 @@ const Gameplay = () => {
 
     // table width and height
     const TABLE_WIDTH = 1000;
-    const TABLE_HEIGHT = 600;
-
-
-    //ball speed and cpu speed modifier for difficulties
-    const speedmodifier = 0.43;
+    const TABLE_HEIGHT = 600
 
     // ball x and y positions; vertical and horizontaly speed
     const [ballX, setBallX] = useState(500);
@@ -32,7 +28,7 @@ const Gameplay = () => {
     // paddles for player 1 and 2; constant paddle size
     const [paddle1Y, setPaddle1Y] = useState(350);
     const [paddle2Y, setPaddle2Y] = useState(350);
-    const PADDLE_HEIGHT = 100; //starts from top then adds to bottom
+    const PADDLE_HEIGHT = 100;
     const PADDLE_THICKNESS = 10;
 
     // mouse movement
@@ -47,8 +43,8 @@ const Gameplay = () => {
     // function for ball movement
     const ballMovement = () => {
         // sets ball velocity
-        setBallX(x => x += ballSpeedX * speedmodifier);
-        setBallY(y => y += ballSpeedY * speedmodifier); 
+        setBallX(x => x += ballSpeedX * 0.65);
+        setBallY(y => y += ballSpeedY * 0.65);
     };
     const collision = () => { 
         // when ball reaches top or bottom of screen, reverse direction
@@ -56,25 +52,18 @@ const Gameplay = () => {
             setBallSpeedY(-ballSpeedY); 
         }
 
-        // when ball collides with cpu. (if the ballY is at the same height as the top of the cpu paddle or lower,
-        //and ballY at the same height as the bottom of the cpu paddle or higher, then collide with it,
-        //+ or - 30 to the paddle height range to add leniency to the collision tracking)
-        //
-        if (ballX > TABLE_WIDTH && ballY >= paddle2Y - 30 && ballY <= paddle2Y+PADDLE_HEIGHT + 40) {
-            setBallX(x => x - 20);
-            setBallSpeedX(speedX => speedX * -1);
-            let deltaY = ballY - (paddle2Y+PADDLE_HEIGHT/2);
-            setBallSpeedY(deltaY * (Math.random() < 0.5 ? -.5 : .5));
-        }
-        //when ball collides with player, same logic as cpu collision 
-        else if (ballX < 0 && ballY > paddle1Y - 30 && ballY < paddle1Y+PADDLE_HEIGHT + 40) {
+        if (ballX < 0 && ballY > paddle1Y && ballY < paddle1Y+PADDLE_HEIGHT) {
             setBallX(x => x + 20);
             setBallSpeedX(speedX => speedX * -1);
             let deltaY = ballY - (paddle1Y+PADDLE_HEIGHT/2);
             setBallSpeedY(deltaY * (Math.random() < 0.5 ? -.5 : .5));
         }
-
-        //when ball reaches left or right edge, add a point and reset
+        else if (ballX > TABLE_WIDTH && ballY > paddle2Y && ballY < paddle2Y+PADDLE_HEIGHT) {
+            setBallX(x => x - 20);
+            setBallSpeedX(speedX => speedX * -1);
+            let deltaY = ballY - (paddle2Y+PADDLE_HEIGHT/2);
+            setBallSpeedY(deltaY * (Math.random() < 0.5 ? -.5 : .5));
+        }
         else if (ballX < 0){
             setPlayer2Score(s => s + 1);
             ballReset();
@@ -93,32 +82,20 @@ const Gameplay = () => {
 
     //computer movement
     const computerMovement = () => {
-
-        //if ball is coming towards the cpu paddle, and after a set distance. This is usually when a human would move their paddle
-        if(ballSpeedX >= 0 && ballX > 150){  
-            //if the ball speed is really low a human being is more likely to track it, so random is set lower and speed is higher
-            if(paddle2Y + 50 + 50  < ballY && Math.abs(ballSpeedY) < 10) 
-            setPaddle2Y(y => y += Math.abs(ballSpeedY) * 3 * speedmodifier / (1 + (0.2*Math.random())));
-            if(paddle2Y + 50 - 50  > ballY && Math.abs(ballSpeedY) < 10) 
-            setPaddle2Y(y => y += Math.abs(ballSpeedY) * 3 * -speedmodifier / (1 + (0.2*Math.random())));
-
-            //paddle2Y + 50 is the center of the paddle, once the ballY is passed either edge of the paddle, adjust paddleY
-            //to be within the edges of the paddle
-            //if 
-            if(paddle2Y + 50 + 50  < ballY) 
-            setPaddle2Y(y => y += Math.abs(ballSpeedY) * speedmodifier / (1 + (0.4*Math.random())));
-            if(paddle2Y + 50 - 50  > ballY) 
-            setPaddle2Y(y => y += Math.abs(ballSpeedY) * -speedmodifier / (1 + (0.4*Math.random())));
-
-            //stuff to test the cpu collision boxes: 
-            //setPaddle2Y(ballY - 50); //moves the center of paddle to the center of the ball immediately
-            //setPaddle2Y(ballY); //moves the top of paddle to the center of the ball immediately
-
-        }
+        //speeds up from long range
+        if(paddle2Y < ballY - 100) setPaddle2Y(y => y + 50 * (Math.random() + 1));
+        //slow at close range
+        else if(paddle2Y < ballY - 50) setPaddle2Y(y => y + 15 * (Math.random() + 1));
         
+        //opposite directions
 
+        else if (paddle2Y > ballY + 100) setPaddle2Y(y => y - 50 * (Math.random() + 1));
 
-        
+        else if (paddle2Y > ballY + 50) setPaddle2Y(y => y - 15 * (Math.random() + 1));
+
+        // harder difficulty
+        // if(paddle2Y < ballY - 50) setPaddle2Y(y => y + 20 * Math.random());
+        // else if (paddle2Y > ballY + 50) setPaddle2Y(y => y - 20 * Math.random());
     }
 
     const replay = () => {
