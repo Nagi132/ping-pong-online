@@ -3,8 +3,6 @@ import './Lobby.css';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import io from 'socket.io-client';
 
-const {num} = require('./difiiculty.js');
-
 function Lobby() {
     const location = useLocation();
     const navigate = useNavigate();
@@ -36,6 +34,7 @@ function Lobby() {
         };
     }, []);
 
+    // Create a new lobby
     const handleCreateLobby = () => {
         console.log('Creating lobby for: ', username);
         const lobbyName = `${username}'s Lobby`;
@@ -47,11 +46,9 @@ function Lobby() {
             }
         });
     }
-    const handle_VS_CPU = () => {
-        console.log('Creating cpu game for: ', username);
-        console.log('difficulty: ', num.dif);
-        navigate(`/Gameplay/undefined`);
-        
+
+    const handlePlayAgainstCPU = () => {
+        navigate('/Gameplay', { state: { mode: 'cpu' } });
     }
 
     return (
@@ -80,22 +77,9 @@ function Lobby() {
                         CREATE LOBBY
                     </button>
                 </div>
-
-                <div className="d-flex justify-content-between mt-5">
-                    <div className="player-section">
-                        <h2 className="lobby-list">VS CPU</h2>
-                    </div>
-                    <button className="btn btn-vsCPU" onClick={() =>  handle_VS_CPU(num.dif = 0)}>
-                        CPU Easy
-                    </button>
-                    <button className="btn btn-vsCPU" onClick={() =>  handle_VS_CPU(num.dif = 1)}>
-                        CPU Normal
-                    </button>
-                    <button className="btn btn-vsCPU" onClick={() =>  handle_VS_CPU(num.dif = 2)}>
-                        CPU Hard
-                    </button>
-                </div>
-                
+                <button className="btn btn-vs-cpu" onClick={handlePlayAgainstCPU}>
+                    PLAY AGAINST CPU
+                </button>
             </div>
         </div>
     );
