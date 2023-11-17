@@ -8,6 +8,7 @@ import Lobby from './components/Lobby';
 import GameplayMenu from "./GameplayMenu";
 import io from 'socket.io-client';
 
+
 const socket = io('http://localhost:4000'); // Connects to socket.io server
 
 function App() {
