@@ -111,8 +111,10 @@ const Gameplay = () => {
     // function for ball movement
     const ballMovement = () => {
         // sets ball velocity
-        setBallX(x => x += ballSpeedX * speedModifier + hitCount / 4);
-        setBallY(y => y += ballSpeedY * speedModifier + hitCount / 4); 
+       if(num.dif != "off"){
+            setBallX(x => x += ballSpeedX * speedModifier + hitCount / 4);
+            setBallY(y => y += ballSpeedY * speedModifier + hitCount / 4); 
+       } 
     };
     const collision = () => {
         // when ball reaches top or bottom of screen, reverse direction
