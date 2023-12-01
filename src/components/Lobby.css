@@ -16,6 +16,7 @@ body {
     -webkit-text-stroke-width: 1px;
   -webkit-text-stroke-color: white;
   font-size: 40px;
+  top: 20%;
 }
 
 .lobby-background {
@@ -38,12 +39,20 @@ body {
     margin-bottom: 10px;
     font-size: 1.5em;
     color:white;
+    
+    text-shadow:
+    3px 3px 0 #000,
+    -3px 3px 0 #000,
+    -3px -3px 0 #000,
+    3px -3px 0 #000;
 }
 
 .player-section {
     font-size: 1.2em;
     width: 100%;
     text-align: center;
+  
+    
 }
 
 .player-container {
@@ -54,6 +63,8 @@ body {
     border-radius: 20px;
     width: 50%;
     max-height: 500px;
+
+    
 }
 
 .player {
@@ -77,25 +88,84 @@ body {
     border-radius: 10px; 
     cursor: pointer; 
     transition: background-color 0.3s ease;
+    margin: 10px;
+
+    text-shadow:
+    3px 3px 0 #000,
+    -3px 3px 0 #000,
+    -3px -3px 0 #000,
+    3px -3px 0 #000;
+
+    
+    
+}
+.lowered{
+    position: absolute;
+    left: 50%;
+    top: 75%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
+.bottom{
+    position: absolute;
+    left: 50%;
+    top: 80%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
+
+.centered{
+    padding: 20px 50px; 
+    font-size: 4em; 
+    color: #fff; 
+    border: none; 
+    border-radius: 10px; 
+    cursor: pointer; 
+    transition: background-color 0.3s ease;
+    margin: 10px;
+
+    text-shadow:
+    3px 3px 0 #000,
+    -3px 3px 0 #000,
+    -3px -3px 0 #000,
+    3px -3px 0 #000;
+    
+        
+        
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
+
+.d-flex{
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+
 }
 .btn:hover {
     background-color: #0056b3; 
 }
 
-.btn-home {
-    margin: 20px;
+.btn-red {
     background-color: red; 
 }
-.btn-vsCPU {
-    margin: 20px;
-    background-color: rgb(10, 183, 33); 
+.btn-green {
+    background-color: rgb(0, 201, 27); 
 }
 
-.btn-create-lobby {
+.btn-blue {
     background-color: blue; 
 }
+.btn-orange {
+    background-color: orange; 
+}
 
-.btn-vs-cpu {
+.btn-purple {
     background-color: purple; 
 }
 
