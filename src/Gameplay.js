@@ -452,9 +452,6 @@ const Gameplay = () => {
                     
                     
                 </div>
-                {visible && (
-                        <p>(Press any button to pause the game)</p>)
-                    }
             </div>
 
             <div className='score'>
@@ -493,6 +490,10 @@ const Gameplay = () => {
                             <p id='countdown'>5</p> 
                        </div>
                 }
+            
+            {visible && (
+                 <p className='pauseInfo'>(Press any button to pause the game)</p>)
+            }
                 
         </div>
     );

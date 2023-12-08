@@ -53,6 +53,7 @@ function Lobby() {
     const handlePlayAgainstCPU = () => {
         num.dif = "off";
         navigate('/Gameplay', { state: { mode: 'cpu' } });
+        window.location.reload();
     }
 
     return (
