@@ -3,6 +3,8 @@ import './Lobby.css';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import io from 'socket.io-client';
 
+const {num} = require('./difiiculty.js');
+
 function Lobby() {
     const location = useLocation();
     const navigate = useNavigate();
@@ -40,6 +42,7 @@ function Lobby() {
             console.log('Username is undefined. Cannot create lobby.');
             return;
         }
+        num.dif = "online";
         console.log('Creating lobby for: ', username);
         const lobbyName = `${username}'s Lobby`;
         socket.emit('createLobby', lobbyName, (response) => {
@@ -52,6 +55,7 @@ function Lobby() {
     }
 
     const handlePlayAgainstCPU = () => {
+        num.dif = "off";
         navigate('/Gameplay', { state: { mode: 'cpu' } });
     }
 
@@ -60,10 +64,11 @@ function Lobby() {
             <div className="lobby-background">
                 <header className="game-lobby-header">
                     <h1 className="game-lobby-title">GAME LOBBY</h1>
+                    <h2></h2>
                 </header>
 
                 <div className="player-section">
-                    <h2 className="lobby-list">LOBBY LIST:</h2>
+                    <h2 className="lobby-list">Lobby list:</h2>
                     <div className="player-container">
                         {lobbies.map((lobby) => (
                             <div key={lobby.id} className="player">
@@ -73,17 +78,18 @@ function Lobby() {
                     </div>
                 </div>
 
-                <div className="d-flex justify-content-between mt-5">
+                <div className="justify-content-between top80">
                     <Link to="/">
-                        <button className="btn btn-home">HOME</button>
+                        <button className="btn">HOME</button>
                     </Link>
-                    <button className="btn btn-create-lobby" onClick={() => handleCreateLobby(username)}>
+                    <button className="btn btn-red" onClick={() => handleCreateLobby(username)}>
                         CREATE LOBBY
                     </button>
                 </div>
-                <button className="btn btn-vs-cpu" onClick={handlePlayAgainstCPU}>
+                <button className="btn btn-purple top90" onClick={handlePlayAgainstCPU}>
                     PLAY AGAINST CPU
                 </button>
+                
             </div>
         </div>
     );
