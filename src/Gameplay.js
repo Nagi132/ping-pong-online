@@ -1,47 +1,92 @@
 
-import React, { useEffect, useRef, useState, useLayoutEffect } from 'react';
+import React, { useEffect, useRef, useState, useLayoutEffect, startTransition } from 'react';
 import { Outlet, Link, useLocation } from "react-router-dom";
 import './index.css';
 import './Gameplay.css';
 
 const {num} = require('./components/difiiculty.js');
 
+
+
 //stores difficulty setting temporarily for pause feature
 var temp = "";
 
 
-//countdown functions
+//keeps count for countdown 
 const startingSeconds = 5;
+var time = 0;
 
-var time = startingSeconds;
+//boolean for if the game is paused or not
+var paused = false;
 
-const countdownEl = document.getElementById('countdown');
+//finds tag named 'countdown'
+//changes the text inside countdown to time - 1 if timer is not 0
 
-setInterval(updateCountdown, 1000);
-
-function updateCountdown(){
+function activateCountdown1(){
     time = startingSeconds;
-    if(countdownEl && time >= 0){
+    temp = "easy";
+}
+function activateCountdown2(){
+    time = startingSeconds;
+    temp = "normal";
+}
+function activateCountdown3(){
+    time = startingSeconds;
+    temp = "hard";
+}
+function updateCountdown(){
+    const countdownEl = document.getElementById('countdown');
+    time--;
+
+    if(countdownEl && time > 0){
+        visible = false;
         countdownEl.innerHTML = `${time}`;
         console.log(time);
-        time--;
+        console.log("temp " + temp);
+        console.log("dif " + num.dif);
         
+
     }
-    
+    if(time == 0){
+        
+        num.dif = temp;
+        console.log("dif " + num.dif);
+
+    }   
 }
-var hitCount = 0;
+
+
+
+//visibility of buttons
+var visible = true;
+
+//runs countdown every 600/1000th of a second
+setInterval(updateCountdown, 600); 
+    
 //amount of times ball was hit off of a paddle
+var hitCount = 0;
+
 
 const Gameplay = () => {
 
+    
+
     //Visibility on difficulty buttons
-    const [visible, setVisible] = useState(true); 
-
+   
+    useEffect(() => {
+        document.addEventListener('keydown', detectKeyDown, true)
+    }, [])
+    
+    const detectKeyDown = (e) => {
+        console.log("key clicked " + e.key);
+        console.log("pausing game now");
+        handlePause();
+    }
     //boolean for timer being visible
-    const [timerVisible, setTimerVisible] = useState(true);
+    const [timerVisible, setTimerVisible] = useState(false);
 
-    //boolean for if the game is paused or not
-    const [paused, setPaused] = useState(false);
+  
+
     
 
     // get mode from lobby
@@ -198,9 +243,21 @@ const Gameplay = () => {
     
     const replay = () => {
         if (winner) {
+            
             setPlayer1Score(0);
             setPlayer2Score(0);
             setWinner(false);
+            num.dif = "off";
+            if(temp == "easy"){
+                activateCountdown1();
+            }
+            if(temp == "normal"){
+                activateCountdown2();
+            }
+            if(temp == "hard"){
+                activateCountdown3();
+            }
+            
         }
     }
 
@@ -210,18 +267,34 @@ const Gameplay = () => {
             setPlayer2Score(0);
             setWinner(false);
             num.dif = "off";
-            setVisible((prev) => !prev);
+            visible = !visible;
         }
     }
 
     const handlePause = () => {
-        setPaused((prev) => !prev);
-        if(paused){
-            num.dif = temp;
+        paused = !paused;
+        console.log("paused " + paused);
+        
+        //unpaused
+        if(!paused){
+            if(temp == "easy"){
+                activateCountdown1();
+            }
+            if(temp == "normal"){
+                activateCountdown2();
+            }
+            if(temp == "hard"){
+                activateCountdown3();
+            }
+            
             console.log("num" + num.dif);
             console.log("temp" + temp);
+            
         }
+        //paused
         else{
+            
+
             temp = num.dif; 
             num.dif = "off";
             console.log("temp" + temp);
@@ -313,7 +386,7 @@ const Gameplay = () => {
     //speedModifier: ball and cpu paddle speed
     //dif1-3 are easy to hard
     const dif1 = () => {
-        setVisible((prev) => !prev);
+        visible = !visible;
         num.dif = "easy";
         console.log('Creating cpu difficulty: ', num.dif);
 
@@ -322,7 +395,7 @@ const Gameplay = () => {
 
     };
     const dif2 = () => {
-        setVisible((prev) => !prev);
+        visible = !visible;
         num.dif = "normal";
         console.log('Creating cpu difficulty: ', num.dif);
 
@@ -330,7 +403,7 @@ const Gameplay = () => {
         accuracy = 0.2;
     };
     const dif3 = () => {
-        setVisible((prev) => !prev);
+        visible = !visible;
         num.dif = "hard";
         console.log('Creating cpu difficulty: ', num.dif);
 
@@ -345,6 +418,7 @@ const Gameplay = () => {
 
     return (
         <div className="container">
+            
             {/* back button */}
             <div className="back">
                 
@@ -366,23 +440,27 @@ const Gameplay = () => {
                     
                     {/* difficulty buttons */}
                     {visible && (
-                        <button className="btn btn-green" onClick={dif1}>Easy</button>)
+                        <button className="btn btn-green" onClick={activateCountdown1}>Easy</button>)
                     }
                    
                     {visible && (
-                        <button className="btn btn-orange" onClick={dif2}>Normal</button>)
+                        <button className="btn btn-orange" onClick={activateCountdown2}>Normal</button>)
                     } 
                     {visible && (
-                        <button className="btn btn-red" onClick={dif3}>Hard</button>)
+                        <button className="btn btn-red" onClick={activateCountdown3}>Hard</button>)
                     }
                     
+                    
                 </div>
+                {visible && (
+                        <p>(Press any button to pause the game)</p>)
+                    }
             </div>
 
             <div className='score'>
-                <h1>{player1Score}</h1>
+                <h2>{player1Score}</h2>
                 <h2 className='winner'> {winner ? 'Game over!' : ''} </h2>
-                <h1>{player2Score}</h1>
+                <h2>{player2Score}</h2>
             </div>
             {/* gameplay */}
             <div className="canvas-container">
@@ -410,10 +488,12 @@ const Gameplay = () => {
             {/* countdown */}
                 {num.dif == "off" 
                     && (time > 0)
+                
                     && <div className="centered">
                             <p id='countdown'>5</p> 
                        </div>
                 }
+                
         </div>
     );
 }

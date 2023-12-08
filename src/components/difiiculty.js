@@ -9,3 +9,4 @@ module.exports = {num};
 //easy- easy mode
 //normal- normal mode
 //hard- hard mode
+//countdown same as off but there is a countdown
