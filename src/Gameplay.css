@@ -1,5 +1,5 @@
 .container {
-  overflow-y: hidden;
+  overflow-y: scroll;
   height: 100vh;
   background-color: #8E8673;
 }
@@ -7,6 +7,7 @@
 .canvas-container {
   width: 100%;
   text-align:center;
+  margin-bottom: 50px;
 }
 
 canvas {
@@ -14,7 +15,6 @@ canvas {
 }
 
 .score {
-  margin-top: 10px;
   display: flex;
   flex-direction: row;
   justify-content: space-around;
@@ -36,9 +36,14 @@ canvas {
   font-size: 1.5rem;
 }
 
+.pauseInfo {
+  bottom: 0;
+  text-align: center;
+  font-size: 1.75rem;
+}
+
 
 p{
-  
 -webkit-text-stroke-color: white;
 -webkit-text-stroke-width: 2px;
 font-size: 60px;
@@ -48,7 +53,7 @@ h2{
   
   -webkit-text-stroke-color: white;
   -webkit-text-stroke-width: 2px;
-  font-size: 70px;
+  font-size: 60px;
   top: 20%;
-  }
+ }
 
