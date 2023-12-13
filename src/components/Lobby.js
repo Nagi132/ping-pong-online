@@ -3,7 +3,7 @@ import './Lobby.css';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import io from 'socket.io-client';
 
-const {num} = require('./difiiculty.js');
+const { num } = require('./difiiculty.js');
 
 function Lobby() {
     const location = useLocation();
@@ -38,12 +38,16 @@ function Lobby() {
 
     // Create a new lobby
     const handleCreateLobby = () => {
+        if (!username) {
+            console.log('Username is undefined. Cannot create lobby.');
+            return;
+        }
         num.dif = "online";
         console.log('Creating lobby for: ', username);
         const lobbyName = `${username}'s Lobby`;
         socket.emit('createLobby', lobbyName, (response) => {
             if (response.status === 'ok') {
-                navigate(`/Gameplay/${response.lobbyId}`);
+                navigate(`/Gameplay/${response.id}`, { state: { role: 'creator' } });
             } else {
                 console.log('Error creating lobby: ', response.message);
             }
@@ -52,7 +56,8 @@ function Lobby() {
 
     const handlePlayAgainstCPU = () => {
         num.dif = "off";
-        navigate('/Gameplay', { state: { mode: 'cpu' } });
+        const cpuGameId = "cpuMode";
+        navigate('/Gameplay', { state: { mode: 'cpu', roomId: cpuGameId } });
         window.location.reload();
     }
 
@@ -69,7 +74,7 @@ function Lobby() {
                     <div className="player-container">
                         {lobbies.map((lobby) => (
                             <div key={lobby.id} className="player">
-                                <Link to={`/Gameplay/${lobby.id}`}>{lobby.name}</Link>
+                                <Link to={`/Gameplay/${lobby.id}`} state={{ role: 'joiner' }}>{lobby.name}</Link>
                             </div>
                         ))}
                     </div>
@@ -86,7 +91,7 @@ function Lobby() {
                 <button className="btn btn-purple top90" onClick={handlePlayAgainstCPU}>
                     PLAY AGAINST CPU
                 </button>
-                
+
             </div>
         </div>
     );
