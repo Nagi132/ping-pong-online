@@ -22,14 +22,16 @@ app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
 const TABLE_WIDTH = 1000;
 const TABLE_HEIGHT = 600;
 const PADDLE_HEIGHT = 100;
+const PADDLE_THICKNESS = 10;
 const WINNING_SCORE = 3;
+
 
 let lobbies = [];
 const gameStates = {};
 const intervalIDs = {};
 
 // Function to initiazlize the game for a new room
-const initializeGameState = (roomId) => {
+const initializeGameState = (roomId, cpuMode = false, difficulty = "easy") => {
     gameStates[roomId] = {
         ballX: 500, // Center of the table
         ballY: 300,
@@ -39,7 +41,9 @@ const initializeGameState = (roomId) => {
         paddle2Y: 350, // Initial Y position of right paddle
         player1Score: 0, // Initial score for player 1
         player2Score: 0, // Initial score for player 2
-        winner: false  // No winner at the start
+        winner: false,  // No winner at the start
+        cpuMode: cpuMode, // Whether the game is in CPU mode
+        difficulty: difficulty, // Difficulty of the CPU
     };
 };
 
@@ -68,52 +72,117 @@ const resetBall = (roomId) => {
     state.ballSpeedY = (Math.random() > 0.5 ? 1 : -1) * 15;
 };
 
-// Function to update the game state for a room
+// Update game state
 const updateGameState = (roomId) => {
+    var hitCount = 0;
     const state = gameStates[roomId];
-    if (!state) return;
-    //console.log(`Updating game state for room: ${roomId}`); // Log for debugging
-
-    // Update ball position
+    if (!state || state.paused || state.winner) return; // Skip update if game is paused
     state.ballX += state.ballSpeedX;
     state.ballY += state.ballSpeedY;
+    // Ball movement
+    // if (state.difficulty !== 'off') {
+    //     state.ballX += state.ballSpeedX * state.speedModifier + state.hitCount / 4;
+    //     state.ballY += state.ballSpeedY * state.speedModifier + state.hitCount / 4;
+    // }
 
-    // Collision with top and bottom boundaries
-    if (state.ballY < 0 || state.ballY > TABLE_HEIGHT) {
-        state.ballSpeedY *= -1;
-        //console.log('1')
+    // Handle collision
+    collision(state);
+
+    // CPU Paddle Movement
+    if (state.cpuMode) {
+        moveCPUPaddle(state);
     }
 
-    // Left paddle
-    if (state.ballX < 0 && state.ballY > state.paddle1Y - 30 && state.ballY < state.paddle1Y + PADDLE_HEIGHT + 40) {
-        state.ballX += 20;
-        //console.log('2')
-        state.ballSpeedX *= -1;// Optionally modify ballSpeedY based on where it hit the paddle
-    }
-    // Right paddle
-    if (state.ballX > TABLE_WIDTH && state.ballY > state.paddle2Y - 30 && state.ballY < state.paddle2Y + PADDLE_HEIGHT + 40) {
-        state.ballX -= 20;
-        //console.log('3')
-        state.ballSpeedX *= -1;// Optionally modify ballSpeedY based on where it hit the paddle
-    }
-
-    // Score keeping
+    // Scoring
     if (state.ballX < 0) { // Ball passed left edge
         state.player2Score += 1;
-        //console.log('4')
-        if (state.player2Score >= WINNING_SCORE) state.winner = 'player2';
-        resetBall(roomId);
+        if (state.player2Score >= WINNING_SCORE) {
+            state.winner = 'player2';
+            console.log('Player 2 wins');
+
+        }
+        ballReset(state);
     } else if (state.ballX > TABLE_WIDTH) { // Ball passed right edge
         state.player1Score += 1;
-        //console.log('5')
-        if (state.player1Score >= WINNING_SCORE) state.winner = 'player1';
-        resetBall(roomId);
+        if (state.player1Score >= WINNING_SCORE) {
+            state.winner = 'player1';
+            console.log('Player 1 wins');
+        }
+        ballReset(state);
     }
 
-    const sanitizedState = sanitizeGameState(state);
-    // Emit the sanitized state
-    io.to(roomId).emit('gameUpdate', sanitizedState);
+    // Emit the updated game state
+    io.to(roomId).emit('gameUpdate', sanitizeGameState(state));
 };
+
+// Move CPU Paddle based on difficulty
+const moveCPUPaddle = (state) => {
+    let speedModifier, accuracy;
+    switch (state.difficulty) {
+        case "easy":
+            speedModifier = 0.5; // increased from 0.3
+            accuracy = 0.5; // increased from 0.3
+            break;
+        case "normal":
+            speedModifier = 0.6; // increased from 0.43
+            accuracy = 0.4; // increased from 0.2
+            break;
+        case "hard":
+            speedModifier = 0.8; // increased from 0.7
+            accuracy = 0.3; // increased from 0.1
+            break;
+        default:
+            speedModifier = 0.5; // increased from 0.3
+            accuracy = 0.5; // increased from 0.3
+    }
+
+    const paddleCenter = state.paddle2Y + PADDLE_HEIGHT / 2;
+    if (state.ballY > paddleCenter && Math.random() < accuracy) {
+        state.paddle2Y = Math.min(state.paddle2Y + speedModifier * 10, TABLE_HEIGHT - PADDLE_HEIGHT); // Increase the speed modifier
+    } else if (state.ballY < paddleCenter && Math.random() < accuracy) {
+        state.paddle2Y = Math.max(state.paddle2Y - speedModifier * 10, 0); // Increase the speed modifier
+    }
+};
+// Collision function
+const collision = (state) => {
+    // Top and bottom boundary collision
+    if (state.ballY < 0 || state.ballY > TABLE_HEIGHT) {
+        state.ballSpeedY *= -1;
+    }
+
+    // Left paddle collision
+    if (state.ballX < 0 && state.ballY > state.paddle1Y - 30 && state.ballY < state.paddle1Y + PADDLE_HEIGHT + 40) {
+        state.ballX = 20;
+        state.ballSpeedX *= -1;
+        const deltaY = state.ballY - (state.paddle1Y + PADDLE_HEIGHT / 2);
+        state.ballSpeedY = deltaY * (Math.random() < 0.5 ? -0.5 : 0.5);
+    }
+
+    // Right paddle collision
+    if (state.ballX > TABLE_WIDTH && state.ballY > state.paddle2Y - 30 && state.ballY < state.paddle2Y + PADDLE_HEIGHT + 40) {
+        state.ballX = TABLE_WIDTH - 20;
+        state.ballSpeedX *= -1;
+        const deltaY = state.ballY - (state.paddle2Y + PADDLE_HEIGHT / 2);
+        state.ballSpeedY = deltaY * (Math.random() < 0.5 ? -0.5 : 0.5);
+    }
+};
+// Reset ball
+const ballReset = (state) => {
+    if (!state) return;
+    state.ballX = TABLE_WIDTH / 2;
+    state.ballY = TABLE_HEIGHT / 2;
+    state.ballSpeedX = (Math.random() > 0.5 ? 1 : -1) * 15; // Randomize the direction
+    state.ballSpeedY = (Math.random() > 0.5 ? 1 : -1) * 15;
+    state.hitCount = 0;
+};
+
+// Function to pause or resume the game
+const togglePause = (roomId, pause) => {
+    const state = gameStates[roomId];
+    if (state) {
+        state.paused = pause;
+    }
+}
 
 const clientRooms = new Map();
 
@@ -121,9 +190,9 @@ io.on('connection', (socket) => {
     console.log('New client connected');
 
     // Listen for joinRoom event from clients
-    socket.on('joinRoom', (roomId) => {
+    socket.on('joinRoom', (roomId, cpuMode = false) => {
         if (!gameStates[roomId]) {
-            initializeGameState(roomId);
+            initializeGameState(roomId, cpuMode);
         }
 
         // Start the game loop
@@ -135,16 +204,47 @@ io.on('connection', (socket) => {
         rooms.push(roomId);
         clientRooms.set(socket.id, rooms);
 
+        // Listen for replay request
+        socket.on('requestReplay', (roomId) => {
+            console.log('Replay requested');
+            if (gameStates[roomId]) {
+                initializeGameState(roomId, gameStates[roomId].cpuMode); // Reinitialize the game state
+                io.to(roomId).emit('gameUpdate', sanitizeGameState(gameStates[roomId])); // Broadcast updated state
+            }
+        });
+
+        // Listen for pause request
+        socket.on('togglePause', (roomId, pause) => {
+            const state = gameStates[roomId];
+            if (state) {
+                state.paused = pause;
+                io.to(roomId).emit('gameUpdate', sanitizeGameState(state));
+            }
+        });
+
+        socket.on('changeDifficulty', (roomId, difficulty) => {
+            if (gameStates[roomId]) {
+                gameStates[roomId].difficulty = difficulty;
+                console.log(`Difficulty set to ${difficulty} for room ${roomId}`);
+            }
+        });
+
         // Set interval only if it doesn't already exist for the room
         if (!intervalIDs[roomId]) {
-            gameStates[roomId].intervalId = setInterval(() => updateGameState(roomId), 1000 / 30);
+            gameStates[roomId].intervalId = setInterval(() => updateGameState(roomId), 1000 / 40);
         }
     });
 
     // Listen for paddle movement from clients
     socket.on('paddleMove', (data) => {
         const { y, roomId, paddle } = data;
+        // Ignore the event if roomId is undefined or invalid
+        if (!roomId || !gameStates[roomId]) {
+
+            return;
+        }
         if (gameStates[roomId]) {
+
             if (paddle === 'left') {
                 gameStates[roomId].paddle1Y = y;
             } else if (paddle === 'right') {
@@ -154,7 +254,6 @@ io.on('connection', (socket) => {
     });
 
     // Send the list of lobbies to the client
-    //console.log(util.inspect(lobbies, { showHidden: false, depth: null }));
     socket.on('join', () => { socket.emit('updateLobbies', lobbies); });
 
     // Listen for the createLobby event
@@ -174,10 +273,10 @@ io.on('connection', (socket) => {
         rooms.forEach(roomId => {
             // Remove the client from the room
             socket.leave(roomId);
-    
+
             // Check if the room is empty
             const room = io.sockets.adapter.rooms.get(roomId);
-            if (!room || room.size === 0) { 
+            if (!room || room.size === 0) {
                 // Clear the interval and delete game state if no more players
                 clearInterval(intervalIDs[roomId]);
                 delete intervalIDs[roomId];
@@ -185,7 +284,7 @@ io.on('connection', (socket) => {
             }
         });
         clientRooms.delete(socket.id);
-        
+
     });
 });
 

@@ -3,7 +3,7 @@ import './Lobby.css';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import io from 'socket.io-client';
 
-const {num} = require('./difiiculty.js');
+const { num } = require('./difiiculty.js');
 
 function Lobby() {
     const location = useLocation();
@@ -56,7 +56,8 @@ function Lobby() {
 
     const handlePlayAgainstCPU = () => {
         num.dif = "off";
-        navigate('/Gameplay', { state: { mode: 'cpu' } });
+        const cpuGameId = "cpuMode";
+        navigate('/Gameplay', { state: { mode: 'cpu', roomId: cpuGameId } });
         window.location.reload();
     }
 
@@ -90,7 +91,7 @@ function Lobby() {
                 <button className="btn btn-purple top90" onClick={handlePlayAgainstCPU}>
                     PLAY AGAINST CPU
                 </button>
-                
+
             </div>
         </div>
     );
