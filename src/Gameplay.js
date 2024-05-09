@@ -11,17 +11,7 @@ const { num } = require('./components/difiiculty.js');
 //stores difficulty setting temporarily for pause feature
 var temp = "";
 
-//keeps count for countdown 
-// const startingSeconds = 5;
-// var time = 0;
-
-//boolean for if the game is paused or not
 var paused = false;
-
-//visibility of buttons
-//var visible = true;
-
-//amount of times ball was hit off of a paddle
 var hitCount = 0;
 
 const Gameplay = () => {
@@ -29,14 +19,17 @@ const Gameplay = () => {
     const [visible, setVisible] = useState(true);
     const [gameActive, setGameActive] = useState(false);
     const [countdownActive, setCountdownActive] = useState(false);
+    const [playerReady, setPlayerReady] = useState(false);
 
     const location = useLocation(); // get mode from lobby
     const { role } = location.state || 'joiner';//default to joiner
     const mode = location.state?.mode || 'multiplayer';//default to multiplayer
-    const roomId = location.pathname.split('/')[2];//get the room id from the url
+    const urlRoomId = location.pathname.split('/')[2];
+    const [roomId, setRoomId] = useState(urlRoomId);// get room id from url
     const [isCPUmode, setIsCPUMode] = useState(mode === 'cpu');
+    const [ready, setReady] = useState(false);
 
-    const socket = useRef();// socket connection
+    const socket = useRef(null);// socket connection
     const canvasRef = useRef();// set up canvas 
 
     const [gameState, setGameState] = useState({
@@ -44,12 +37,14 @@ const Gameplay = () => {
         player1Score: 0, player2Score: 0, winner: false
     });
 
+    const animationFrameId = useRef(null);
+
     useEffect(() => {
         const countdownInterval = setInterval(updateCountdown, 1000);
         return () => clearInterval(countdownInterval); // Clear interval on component unmount
-    }, []);
+    }, [ready]);
 
-    //Visibility on difficulty buttons
+    // Visibility on difficulty buttons
     useEffect(() => {
         document.addEventListener('keydown', detectKeyDown, true)
     }, [])
@@ -61,10 +56,46 @@ const Gameplay = () => {
     }
 
     useEffect(() => {
-        socket.current = io('http://localhost:4000');
+        const newSocket = io('http://localhost:4000');
+        socket.current = newSocket;
+        console.log("Socket initialized and connecting...");
         console.log("Mode in useEffect:", mode);
-        socket.current.emit('joinRoom', roomId, isCPUmode);
-        socket.current.on('gameUpdate', (newGameState) => {
+
+        newSocket.on('connect', () => {
+            if (isCPUmode) {
+                console.log("CPU mode activated");
+            } else {
+                console.log('Connected to server. Socket ID:', newSocket.id); // This should log a valid socket ID
+                newSocket.emit('joinRoom', roomId);
+            }
+        });
+
+        newSocket.on('cpuGameStarted', ({ roomId }) => {
+            console.log(`CPU game started in room: ${roomId}`);
+            setRoomId(roomId);
+            setGameActive(true); // Activate the game
+            // Use roomId for game management
+        });
+
+        newSocket.on('playerReady', () => {
+            console.log("Acknowledged player ready from server.");
+            setReady(true);
+        });
+
+        // Listen for player count updates
+        newSocket.on('playerCount', ({ count }) => {
+            console.log(`Number of players in room: ${count}`);
+        });
+
+        newSocket.on('stopCountdown', () => {
+            console.log("Countdown stopped by server.");
+            setCountdownActive(false); // Stop the countdown
+            setTime(5); // Reset the countdown
+        });
+
+
+        // Listen for game updates
+        newSocket.on('gameUpdate', (newGameState) => {
             setGameState(newGameState);
             if (newGameState.player1Score >= WINNING_SCORE || newGameState.player2Score >= WINNING_SCORE) {
                 console.log("Setting winner to true");
@@ -73,80 +104,117 @@ const Gameplay = () => {
         });
 
         return () => {
-            socket.current.disconnect();
-            socket.current.off('gameUpdate');
+            newSocket.off('cpuGameStarted');
+            newSocket.off('playerCount');
+            newSocket.off('playerReady');
+            newSocket.off('startCountdown');
+            newSocket.off('stopCountdown');
+            newSocket.off('gameUpdate');
+            newSocket.disconnect();
         };
-    }, [roomId, isCPUmode]);
+    }, [isCPUmode]);
+
+    useEffect(() => {
+        let interval = null;
+        let gameStarted = false;
+
+        if (countdownActive) {
+            interval = setInterval(() => {
+                setTime((prevTime) => {
+                    const newTime = prevTime - 1;
+                    if (newTime > 0) {
+                        return newTime;  // Continue countdown
+                    } else {
+                        clearInterval(interval); // Stop the interval at zero
+                        if (!gameStarted) {
+                            console.log("Countdown finished. Game should start now.");
+                            setGameActive(true); // Activate the game
+                            setCountdownActive(false); // Deactivate the countdown
+                            if (roomId) {
+                                console.log("Emitting startGame with roomId:", roomId);
+                                socket.current.emit('startGame', roomId);
+                                gameStarted = true;
+                            } else {
+                                console.log("Room ID not defined. Cannot start game.");
+                            }
+                        }
+                        // Signal the server to start the game
+                        return 0;  // Keep at zero until reset
+                    }
+                });
+            }, 1000);
+        } else {
+            clearInterval(interval);
+            setTime(5); // Reset the countdown if not active
+        }
+
+        return () => clearInterval(interval); // Cleanup interval on component unmount
+    }, [countdownActive, roomId, setGameActive, setTime]);
+
+
+
+    // Listen for countdown start signal from the server
+    useEffect(() => {
+        const handleStartCountdown = () => {
+            console.log("Countdown started by server.");
+            setCountdownActive(true);
+            setTime(5);  // Reset the countdown time
+        };
+
+        socket.current.on('startCountdown', handleStartCountdown);
+
+        return () => {
+            socket.current.off('startCountdown', handleStartCountdown);
+        };
+    }, []);
+
+    const handleReady = () => {
+        if (socket.current) {
+            console.log('Ready button clicked by', socket.current.id);
+            setPlayerReady(true);
+            socket.current.emit('playerReady', roomId);
+        } else {
+            console.log("socket not initialized");
+        }
+    };
 
     function updateCountdown() {
-        setTime(currentTime => {
-            if (currentTime > 1) {
-                setVisible(false); // Hide the buttons as countdown proceeds
-                return currentTime - 1;
-            } else {
-                // Countdown has finished, start the game
-                //setVisible(false); // Make buttons visible again
-                num.dif = temp; // Set the difficulty
-                setGameActive(true); // Activate the game
-                //setCountdownActive(false); // Deactivate the countdown
-                return 0; // Reset countdown
-            }
-        });
+        if (ready && playerReady) {
+            setTime(currentTime => {
+                if (currentTime > 1) {
+                    setVisible(false); // Hide the buttons as countdown proceeds
+                    return currentTime - 1;
+                } else {
+                    // Countdown has finished, start the game
+                    num.dif = temp; // Set the difficulty
+                    setGameActive(true); // Activate the game
+                }
+            });
+        }
     }
 
-    const activateCountdown1 = () => {
+    const activateCountdown = (difficulty) => {
+        console.log('startCPUGame with difficulty:', difficulty)
         setVisible(false); // Hide difficulty buttons during countdown
         setGameActive(false);
         setTime(5);
-        temp = "easy";
+        temp = difficulty;
         setCountdownActive(true);
-    }
-    const activateCountdown2 = () => {
-        setVisible(false); // Hide difficulty buttons during countdown
-        setGameActive(false);
-        setTime(5);
-        temp = "normal";
-        setCountdownActive(true);
-    }
-    const activateCountdown3 = () => {
-        setVisible(false); // Hide difficulty buttons during countdown
-        setGameActive(false);
-        setTime(5);
-        temp = "hard";
-        setCountdownActive(true);
+
+        // Emit an event to the server to initialize the CPU game with the selected difficulty
+        socket.current.emit('startCPUGame', { difficulty });
+
     }
 
     // Debounced function for emitting paddle movements
     const emitPaddleMove = useRef(debounce((y, roomId, paddle) => {
-        console.log("Emitting Paddle Move:", { y, roomId, paddle });
+        //console.log("Emitting Paddle Move:", { y, roomId, paddle });
         if (isCPUmode && paddle === 'right') {
             // In CPU mode, do not emit movements for the right paddle
             return;
         }
         socket.current.emit('paddleMove', { y, roomId, paddle });
     }, 5)).current;
-
-    // Event listener for mouse movement
-    useEffect(() => {
-        const handleMouseMove = (event) => {
-            const canvas = canvasRef.current;
-            if (canvas) {
-                const rect = canvas.getBoundingClientRect();
-                const newY = Math.max(0, Math.min(event.clientY - rect.top - PADDLE_HEIGHT / 2, TABLE_HEIGHT - PADDLE_HEIGHT));
-
-                if (!isCPUmode) {
-                    emitPaddleMove(newY, roomId, role === 'creator' ? 'left' : 'right');
-                } else {
-                    // Directly update the paddle position in CPU mode
-                    setPaddle1Y(newY);
-                }
-            }
-        };
-
-        document.addEventListener('mousemove', handleMouseMove);
-        return () => document.removeEventListener('mousemove', handleMouseMove);
-    }, [isCPUmode, emitPaddleMove, roomId, role]);
-
 
     // set replay button
     const buttonReplay = useRef();
@@ -182,7 +250,7 @@ const Gameplay = () => {
     const [player1Score, setPlayer1Score] = useState(0);
     const [player2Score, setPlayer2Score] = useState(0);
     const [winner, setWinner] = useState(false);
-    const WINNING_SCORE = 3;
+    const WINNING_SCORE = 5;
 
     // function for ball movement
     const ballMovement = () => {
@@ -273,20 +341,12 @@ const Gameplay = () => {
 
     const replay = () => {
         if (winner) {
-
             setPlayer1Score(0);
             setPlayer2Score(0);
             setWinner(false);
             num.dif = "off";
-            if (temp == "easy") {
-                activateCountdown1();
-            }
-            if (temp == "normal") {
-                activateCountdown2();
-            }
-            if (temp == "hard") {
-                activateCountdown3();
-            }
+            activateCountdown(temp);
+
             socket.current.emit('requestReplay', roomId);
         }
 
@@ -306,30 +366,15 @@ const Gameplay = () => {
     const handlePause = () => {
         paused = !paused;
         console.log("paused " + paused);
-
-        //unpaused
         if (!paused) {
-            if (temp == "easy") {
-                activateCountdown1();
-            }
-            if (temp == "normal") {
-                activateCountdown2();
-            }
-            if (temp == "hard") {
-                activateCountdown3();
-            }
-
-            console.log("num" + num.dif);
-            console.log("temp" + temp);
-
-        }
-        //paused
-        else {
-            temp = num.dif;
+            console.log("Game resumed with difficulty:", temp);
+            activateCountdown(temp); // Resume with the previous difficulty setting
+        } else {
+            temp = num.dif; // Save the current difficulty setting before pausing
             num.dif = "off";
-            console.log("temp" + temp);
-            console.log("num" + num.dif);
+            console.log("Game paused, difficulty was:", temp);
         }
+
         // Send pause/resume signal to server
         socket.current.emit('togglePause', roomId, paused);
 
@@ -347,49 +392,46 @@ const Gameplay = () => {
         return () => cancelAnimationFrame(timerId);
     }, [winner])
 
-    // draw canvas
     useEffect(() => {
         const canvas = canvasRef.current;
-        if (!canvas || !gameActive) return;
+        if (!canvas) return;
         const context = canvas.getContext('2d');
-
         canvas.width = TABLE_WIDTH;
         canvas.height = TABLE_HEIGHT;
 
-        let animationFrameId;
+        // Draw the static parts of the game board
+        context.fillStyle = '#00A650'; // Green table
+        context.fillRect(0, 0, TABLE_WIDTH, TABLE_HEIGHT);
 
-        //function to draw the game
+        context.fillStyle = '#FFFFFF'; // White net
+        for (let i = 0; i < TABLE_HEIGHT; i += 30) {
+            context.fillRect(TABLE_WIDTH / 2 - 1, i, 2, 15);
+        }
+    }, []);
+
+    //draw canvas
+    useEffect(() => {
+        if (!gameActive) return;
+
+        const canvas = canvasRef.current;
+        const context = canvas.getContext('2d');
+
+        // //function to draw the game
         const drawGame = () => {
             context.clearRect(0, 0, canvas.width, canvas.height); // Clear canvas
-            const leftPaddleY = isCPUmode ? paddle1Y : gameState.paddle1Y;
 
-            // creates green table
-            context.fillStyle = '#00A650';
-            context.fillRect(0, 0, TABLE_WIDTH, TABLE_HEIGHT);
+            //Draw the static and dynamic elements
+            drawStaticElements(context);
+            drawDynamicElements(context);
 
-            context.fillStyle = '#FFFFFF';
-            // net
-            for (let i = 0; i < TABLE_WIDTH; i += 30) {
-                context.fillRect(TABLE_WIDTH / 2, i, 2, 25);
-            }
-            // left player paddle
-            context.fillRect(0, leftPaddleY, PADDLE_THICKNESS, PADDLE_HEIGHT);
-            // right CPU paddle
-            context.fillRect(TABLE_WIDTH - PADDLE_THICKNESS, gameState.paddle2Y, PADDLE_THICKNESS, PADDLE_HEIGHT);
-            // draws ball
-            context.beginPath();
-            context.arc(gameState.ballX, gameState.ballY, 10, 0, Math.PI * 2, true);
-            context.fill();
-
-            animationFrameId = requestAnimationFrame(drawGame);
+            animationFrameId.current = requestAnimationFrame(drawGame);
         };
 
         drawGame();
-        if (player1Score === WINNING_SCORE || player2Score === WINNING_SCORE) setWinner(true);
 
         // player movement
         const updateMousePosition = event => {
-            console.log("updateMousePosition");
+            //console.log("updateMousePosition");
             const rect = canvas.getBoundingClientRect();
             const newY = event.clientY - rect.top;
             const adjustedY = Math.max(0, Math.min(newY - PADDLE_HEIGHT / 2, TABLE_HEIGHT - PADDLE_HEIGHT));
@@ -398,7 +440,7 @@ const Gameplay = () => {
                 emitPaddleMove(newY, roomId, role === 'creator' ? 'left' : 'right');
             } else {
                 // In CPU mode, directly update the paddle position without emitting to the server
-                setPaddle1Y(adjustedY);
+                emitPaddleMove(adjustedY, roomId, 'left');
             }
         };
         canvas.addEventListener('mousemove', updateMousePosition);
@@ -409,53 +451,46 @@ const Gameplay = () => {
 
     }, [gameState, paddle1Y, roomId, role, emitPaddleMove, isCPUmode, gameActive]);
 
+    useEffect(() => {
+        if (player1Score >= WINNING_SCORE || player2Score >= WINNING_SCORE) {
+            setWinner(true);
+            cancelAnimationFrame(animationFrameId.current);
+        }
+    }, [player1Score, player2Score]);
 
-    // Create a new lobby
-    //accuracy: how random cpu paddle can be
-    //speedModifier: ball and cpu paddle speed
-    //dif1-3 are easy to hard
-    const dif1 = () => {
-        visible = !visible;
-        num.dif = "easy";
-        console.log('Creating cpu difficulty: ', num.dif);
-
-        speedModifier = 0.30;
-        accuracy = 0.3;
-        // Inform server about difficulty change
-        socket.current.emit('changeDifficulty', roomId, 'easy');
-
+    const drawStaticElements = (context) => {
+        // Draw table and net
+        context.fillStyle = '#00A650';
+        context.fillRect(0, 0, TABLE_WIDTH, TABLE_HEIGHT);
+        context.fillStyle = '#FFFFFF';
+        for (let i = 0; i < TABLE_HEIGHT; i += 30) {
+            context.fillRect(TABLE_WIDTH / 2, i, 2, 25);
+        }
     };
-    const dif2 = () => {
-        visible = !visible;
-        num.dif = "normal";
-        console.log('Creating cpu difficulty: ', num.dif);
 
-        speedModifier = 0.43;
-        accuracy = 0.2;
-        // Inform server about difficulty change
-        socket.current.emit('changeDifficulty', roomId, 'normal');
-    };
-    const dif3 = () => {
-        visible = !visible;
-        num.dif = "hard";
-        console.log('Creating cpu difficulty: ', num.dif);
-
-        speedModifier = 0.7;
-        accuracy = 0.1;
-        // Inform server about difficulty change
-        socket.current.emit('changeDifficulty', roomId, 'hard');
+    const drawDynamicElements = (context) => {
+        // Draw paddles and ball
+        context.fillRect(0, gameState.paddle1Y, PADDLE_THICKNESS, PADDLE_HEIGHT);
+        context.fillRect(TABLE_WIDTH - PADDLE_THICKNESS, gameState.paddle2Y, PADDLE_THICKNESS, PADDLE_HEIGHT);
+        context.beginPath();
+        context.arc(gameState.ballX, gameState.ballY, 10, 0, Math.PI * 2, true);
+        context.fill();
     };
 
     return (
         <div className="container">
+            <div className="d-flex justify-content-between mt-5">
+                {!countdownActive && !playerReady && !isCPUmode && (<button onClick={handleReady} >Ready</button>
+                )}
 
+            </div>
             {/* back button */}
             <div className="back">
                 {/* testing buttons */}
                 <div className="d-flex justify-content-between mt-5"></div>
-                <Link to={`../Lobby`}><button className="btn btn-red">Quit</button></Link>
+                <Link to={`../Lobby`}><button className="btn btn-home">Home</button></Link>
                 <Link to="/">
-                    <button className="btn btn-home">HOME</button>
+                    <button className="btn btn-red">Quit</button>
                 </Link>
 
                 {/* Difficulty Buttons: Only show when in CPU mode */}
@@ -464,16 +499,16 @@ const Gameplay = () => {
                         <header className="game-lobby-header">
                             <h1 className="game-lobby-title">Choose a difficulty</h1>
                         </header>
-                        <button className="btn btn-green" onClick={activateCountdown1()}>Easy</button>
-                        <button className="btn btn-orange" onClick={activateCountdown2()}>Normal</button>
-                        <button className="btn btn-red" onClick={activateCountdown3()}>Hard</button>
+                        <button className="btn btn-green" onClick={() => activateCountdown('easy')}>Easy</button>
+                        <button className="btn btn-orange" onClick={() => activateCountdown('normal')}>Normal</button>
+                        <button className="btn btn-red" onClick={() => activateCountdown('hard')}>Hard</button>
                         <p>(Press any button to pause the game)</p>
                     </div>
                 )}
             </div>
 
             {/* countdown */}
-            {!gameActive && time > 0 && (
+            {countdownActive && (
                 <div className="centered">
                     <p id='countdown'>{time}</p>
                 </div>
@@ -486,30 +521,31 @@ const Gameplay = () => {
             </div>
 
             {/* gameplay */}
-            {gameActive && (
-                <div className="canvas-container">
-                    <canvas ref={canvasRef} />
+
+            <div className="canvas-container">
+                <canvas ref={canvasRef} />
+            </div>
+
+
+            {/* replay buttons */}
+            {isCPUmode && winner && (
+                <div className="d-flex justify-content-between mt-5">
+                    {winner && <button className='btn btn-green' onClick={replay} ref={buttonReplay}>Replay?</button>}
+                    {winner && <button className='btn btn-orange' onClick={replayChangeDif} ref={buttonReplay}>Change Difficulty</button>}
                 </div>
             )}
 
-            {/* replay buttons */}
-            <div className="d-flex justify-content-between mt-5">
-                {winner && <button className='btn btn-green' onClick={replay} ref={buttonReplay}>Replay?</button>}
-                {winner && <button className='btn btn-orange' onClick={replayChangeDif} ref={buttonReplay}>Change Difficulty</button>}
-
-            </div>
-
             {/* pause buttons */}
-            <div className=" justify-content-between mt-5">
-                {num.dif != "online"
-                    && !paused
-                    && <button className='btn btn-purple lowered' onClick={handlePause} ref={buttonReplay}>| |</button>}
-            </div>
-            <div className=" justify-content-between mt-5">
-                {num.dif != "online"
-                    && paused
-                    && <button className='btn btn-purple lowered' onClick={handlePause} ref={buttonReplay}>resume</button>}
-            </div>
+
+            {isCPUmode && (
+                <div className="pause-buttons mt-5">
+                    {!paused ? (
+                        <button className='btn btn-purple lowered' onClick={handlePause}>Pause</button>
+                    ) : (
+                        <button className='btn btn-purple lowered' onClick={handlePause}>Resume</button>
+                    )}
+                </div>
+            )}
         </div>
     );
 }

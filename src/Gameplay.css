@@ -5,8 +5,9 @@
 }
 
 .canvas-container {
+  display: block;
   width: 100%;
-  text-align:center;
+  text-align: center;
   margin-bottom: 50px;
 }
 
@@ -20,13 +21,13 @@ canvas {
   justify-content: space-around;
 }
 
-.winner{
+.winner {
   text-align: center;
 }
 
 .replay {
   width: 100%;
-  text-align:center;
+  text-align: center;
 }
 
 .replay button {
@@ -43,17 +44,17 @@ canvas {
 }
 
 
-p{
--webkit-text-stroke-color: white;
--webkit-text-stroke-width: 2px;
-font-size: 60px;
-top: 20%;
-}
-h2{
-  
+p {
   -webkit-text-stroke-color: white;
   -webkit-text-stroke-width: 2px;
   font-size: 60px;
   top: 20%;
- }
+}
 
+h2 {
+
+  -webkit-text-stroke-color: white;
+  -webkit-text-stroke-width: 2px;
+  font-size: 60px;
+  top: 20%;
+}
