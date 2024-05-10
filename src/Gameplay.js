@@ -203,7 +203,6 @@ const Gameplay = () => {
 
         // Emit an event to the server to initialize the CPU game with the selected difficulty
         socket.current.emit('startCPUGame', { difficulty });
-
     }
 
     // Debounced function for emitting paddle movements
@@ -228,14 +227,14 @@ const Gameplay = () => {
 
 
     //ball speed and cpu speed modifier for difficulties
-    var speedModifier = 0;
-    var accuracy = 0;
+    // var speedModifier = 0;
+    // var accuracy = 0;
 
     // ball x and y positions; vertical and horizontaly speed
-    const [ballX, setBallX] = useState(500);
-    const [ballY, setBallY] = useState(300);
-    const [ballSpeedX, setBallSpeedX] = useState(15);
-    const [ballSpeedY, setBallSpeedY] = useState(15);
+    // const [ballX, setBallX] = useState(500);
+    // const [ballY, setBallY] = useState(300);
+    // const [ballSpeedX, setBallSpeedX] = useState(15);
+    // const [ballSpeedY, setBallSpeedY] = useState(15);
 
     // paddles for player 1 and 2; constant paddle size
     const [paddle1Y, setPaddle1Y] = useState(350);
@@ -253,90 +252,90 @@ const Gameplay = () => {
     const WINNING_SCORE = 5;
 
     // function for ball movement
-    const ballMovement = () => {
-        // sets ball velocity
-        if (num.dif != "off") {
-            setBallX(x => x += ballSpeedX * speedModifier + hitCount / 4);
-            setBallY(y => y += ballSpeedY * speedModifier + hitCount / 4);
-        }
-    };
-    const collision = () => {
-        console.log("collision in gameplay");
-        // when ball reaches top or bottom of screen, reverse direction
-        if (ballY + ballSpeedY < 0 || ballY + ballSpeedY > TABLE_HEIGHT) {
-            setBallSpeedY(-ballSpeedY);
-        }
+    // const ballMovement = () => {
+    //     // sets ball velocity
+    //     if (num.dif != "off") {
+    //         setBallX(x => x += ballSpeedX * speedModifier + hitCount / 4);
+    //         setBallY(y => y += ballSpeedY * speedModifier + hitCount / 4);
+    //     }
+    // };
+    // const collision = () => {
+    //     console.log("collision in gameplay");
+    //     // when ball reaches top or bottom of screen, reverse direction
+    //     if (ballY + ballSpeedY < 0 || ballY + ballSpeedY > TABLE_HEIGHT) {
+    //         setBallSpeedY(-ballSpeedY);
+    //     }
 
-        // when ball collides with cpu. (if the ballY is at the same height as the top of the cpu paddle or lower,
-        //and ballY at the same height as the bottom of the cpu paddle or higher, then collide with it,
-        //+ or - 20 to the paddle height range to add leniency to the collision tracking)
-        //
-        if (ballX > TABLE_WIDTH && ballY >= paddle2Y - 30 && ballY <= paddle2Y + PADDLE_HEIGHT + 30) {
-            setBallX(x => x - 20);
-            setBallSpeedX(speedX => speedX * -1);
-            let deltaY = ballY - (paddle2Y + PADDLE_HEIGHT / 2);
-            setBallSpeedY(deltaY * (Math.random() < 0.5 ? -.5 : .5));
-            hitCount++;
-        }
-        //when ball collides with player, same logic as cpu collision 
-        else if (ballX < 0 && ballY > paddle1Y - 30 && ballY < paddle1Y + PADDLE_HEIGHT + 40) {
-            setBallX(x => x + 20);
-            setBallSpeedX(speedX => speedX * -1);
-            let deltaY = ballY - (paddle1Y + PADDLE_HEIGHT / 2);
-            setBallSpeedY(deltaY * (Math.random() < 0.5 ? -.5 : .5));
+    //     // when ball collides with cpu. (if the ballY is at the same height as the top of the cpu paddle or lower,
+    //     //and ballY at the same height as the bottom of the cpu paddle or higher, then collide with it,
+    //     //+ or - 20 to the paddle height range to add leniency to the collision tracking)
+    //     //
+    //     if (ballX > TABLE_WIDTH && ballY >= paddle2Y - 30 && ballY <= paddle2Y + PADDLE_HEIGHT + 30) {
+    //         setBallX(x => x - 20);
+    //         setBallSpeedX(speedX => speedX * -1);
+    //         let deltaY = ballY - (paddle2Y + PADDLE_HEIGHT / 2);
+    //         setBallSpeedY(deltaY * (Math.random() < 0.5 ? -.5 : .5));
+    //         hitCount++;
+    //     }
+    //     //when ball collides with player, same logic as cpu collision 
+    //     else if (ballX < 0 && ballY > paddle1Y - 30 && ballY < paddle1Y + PADDLE_HEIGHT + 40) {
+    //         setBallX(x => x + 20);
+    //         setBallSpeedX(speedX => speedX * -1);
+    //         let deltaY = ballY - (paddle1Y + PADDLE_HEIGHT / 2);
+    //         setBallSpeedY(deltaY * (Math.random() < 0.5 ? -.5 : .5));
 
-            hitCount++;
-        }
+    //         hitCount++;
+    //     }
 
-        //when ball reaches left or right edge, add a point and reset
-        else if (ballX < 0) {
-            setPlayer2Score(s => s + 1);
-            ballReset();
-            hitCount = 0;
-        }
-        else if (ballX > TABLE_WIDTH) {
-            setPlayer1Score(s => s + 1);
-            ballReset();
-            hitCount = 0;
-        }
-    }
+    //     //when ball reaches left or right edge, add a point and reset
+    //     else if (ballX < 0) {
+    //         setPlayer2Score(s => s + 1);
+    //         ballReset();
+    //         hitCount = 0;
+    //     }
+    //     else if (ballX > TABLE_WIDTH) {
+    //         setPlayer1Score(s => s + 1);
+    //         ballReset();
+    //         hitCount = 0;
+    //     }
+    // }
     // when wall collision occurs
-    const ballReset = () => {
-        setBallX(500);
-        setBallY(300);
-        setBallSpeedX(-ballSpeedX);
-    }
+    // const ballReset = () => {
+    //     setBallX(500);
+    //     setBallY(300);
+    //     setBallSpeedX(-ballSpeedX);
+    // }
 
     //computer movement
-    const computerMovement = () => {
-        if (isCPUmode) {
-            // Check which difficulty is selected and adjust the CPU paddle movement accordingly
-            switch (num.dif) {
-                case "easy":
-                    moveCPUPaddle(0.3, 0.3); // Lower speed and accuracy for easy mode
-                    break;
-                case "normal":
-                    moveCPUPaddle(0.43, 0.2); // Medium speed and accuracy for normal mode
-                    break;
-                case "hard":
-                    moveCPUPaddle(0.7, 0.1); // Higher speed and accuracy for hard mode
-                    break;
-                default:
-                    // Default behavior if no difficulty is selected
-                    moveCPUPaddle(0.3, 0.3); // You can adjust these values as needed
-            }
-        }
-    };
+    // const computerMovement = () => {
+    //     if (isCPUmode) {
+    //         // Check which difficulty is selected and adjust the CPU paddle movement accordingly
+    //         switch (num.dif) {
+    //             case "easy":
+    //                 moveCPUPaddle(0.3, 0.3); // Lower speed and accuracy for easy mode
+    //                 break;
+    //             case "normal":
+    //                 moveCPUPaddle(0.43, 0.2); // Medium speed and accuracy for normal mode
+    //                 break;
+    //             case "hard":
+    //                 moveCPUPaddle(0.7, 0.1); // Higher speed and accuracy for hard mode
+    //                 break;
+    //             default:
+    //                 // Default behavior if no difficulty is selected
+    //                 moveCPUPaddle(0.3, 0.3); // You can adjust these values as needed
+    //         }
+    //     }
+    // };
 
-    const moveCPUPaddle = (speedModifier, accuracy) => {
-        // Implement the logic to move the CPU paddle based on the ball's position and the given speed and accuracy
-        const paddleCenter = paddle2Y + PADDLE_HEIGHT / 2;
-        if (ballY > paddleCenter && Math.random() < accuracy) {
-            setPaddle2Y(y => Math.min(y + speedModifier * 5, TABLE_HEIGHT - PADDLE_HEIGHT));
-        } else if (ballY < paddleCenter && Math.random() < accuracy) {
-            setPaddle2Y(y => Math.max(y - speedModifier * 5, 0));
-        }
-    };
+    // const moveCPUPaddle = (speedModifier, accuracy) => {
+    //     // Implement the logic to move the CPU paddle based on the ball's position and the given speed and accuracy
+    //     const paddleCenter = paddle2Y + PADDLE_HEIGHT / 2;
+    //     if (ballY > paddleCenter && Math.random() < accuracy) {
+    //         setPaddle2Y(y => Math.min(y + speedModifier * 5, TABLE_HEIGHT - PADDLE_HEIGHT));
+    //     } else if (ballY < paddleCenter && Math.random() < accuracy) {
+    //         setPaddle2Y(y => Math.max(y - speedModifier * 5, 0));
+    //     }
+    // };
 
 
     const replay = () => {
