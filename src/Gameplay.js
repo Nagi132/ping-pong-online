@@ -207,7 +207,6 @@ const Gameplay = () => {
 
     // Debounced function for emitting paddle movements
     const emitPaddleMove = useRef(debounce((y, roomId, paddle) => {
-        //console.log("Emitting Paddle Move:", { y, roomId, paddle });
         if (isCPUmode && paddle === 'right') {
             // In CPU mode, do not emit movements for the right paddle
             return;
@@ -238,12 +237,12 @@ const Gameplay = () => {
 
     // paddles for player 1 and 2; constant paddle size
     const [paddle1Y, setPaddle1Y] = useState(350);
-    const [paddle2Y, setPaddle2Y] = useState(350);
+    //const [paddle2Y, setPaddle2Y] = useState(350);
     const PADDLE_HEIGHT = 100; //starts from top then adds to bottom
     const PADDLE_THICKNESS = 10;
 
     // mouse movement
-    const [mousePosition, setMousePosition] = useState({ x: null, y: null });
+    //const [mousePosition, setMousePosition] = useState({ x: null, y: null });
 
     // player scoring; winning score is 3
     const [player1Score, setPlayer1Score] = useState(0);
@@ -430,7 +429,6 @@ const Gameplay = () => {
 
         // player movement
         const updateMousePosition = event => {
-            //console.log("updateMousePosition");
             const rect = canvas.getBoundingClientRect();
             const newY = event.clientY - rect.top;
             const adjustedY = Math.max(0, Math.min(newY - PADDLE_HEIGHT / 2, TABLE_HEIGHT - PADDLE_HEIGHT));
@@ -438,7 +436,7 @@ const Gameplay = () => {
                 // In multiplayer mode, emit paddle movement to the server
                 emitPaddleMove(newY, roomId, role === 'creator' ? 'left' : 'right');
             } else {
-                // In CPU mode, directly update the paddle position without emitting to the server
+                // In CPU mode, only emit paddle movement for the left paddle
                 emitPaddleMove(adjustedY, roomId, 'left');
             }
         };
@@ -457,8 +455,8 @@ const Gameplay = () => {
         }
     }, [player1Score, player2Score]);
 
+    // Draw table and net
     const drawStaticElements = (context) => {
-        // Draw table and net
         context.fillStyle = '#00A650';
         context.fillRect(0, 0, TABLE_WIDTH, TABLE_HEIGHT);
         context.fillStyle = '#FFFFFF';
@@ -467,8 +465,8 @@ const Gameplay = () => {
         }
     };
 
+    // Draw paddles and ball
     const drawDynamicElements = (context) => {
-        // Draw paddles and ball
         context.fillRect(0, gameState.paddle1Y, PADDLE_THICKNESS, PADDLE_HEIGHT);
         context.fillRect(TABLE_WIDTH - PADDLE_THICKNESS, gameState.paddle2Y, PADDLE_THICKNESS, PADDLE_HEIGHT);
         context.beginPath();

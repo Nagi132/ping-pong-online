@@ -101,7 +101,6 @@ const updateGameState = (roomId) => {
     collision(state);
 
     if (state.cpuMode) {
-        //console.log("Moving CPU Paddle");
         moveCPUPaddle(state, state.difficulty);
     }
 
@@ -127,11 +126,10 @@ const updateGameState = (roomId) => {
 
 // Move CPU Paddle based on difficulty
 const moveCPUPaddle = (state) => {
-    //console.log("Moving CPU Paddle 2");
     let speedModifier, accuracy;
     switch (state.difficulty) {
         case "easy":
-            speedModifier = 1.0;  // Adjusted for faster movement
+            speedModifier = 1.0;  
             accuracy = 0.7;
             break;
         case "normal":
@@ -152,7 +150,7 @@ const moveCPUPaddle = (state) => {
     if (state.ballY > paddleCenter && Math.random() < accuracy) {
         state.paddle2Y = Math.min(state.paddle2Y + speedModifier * 10, TABLE_HEIGHT - PADDLE_HEIGHT); // Increase the speed modifier
     } else if (state.ballY < paddleCenter && Math.random() < accuracy) {
-        state.paddle2Y = Math.max(state.paddle2Y - speedModifier * 10, 0); // Increase the speed modifier
+        state.paddle2Y = Math.max(state.paddle2Y - speedModifier * 10, 0); 
     }
     //console.log(`CPU Paddle moved from ${oldY} to ${state.paddle2Y} using speed ${speedModifier} and accuracy ${accuracy}`);
 
@@ -180,6 +178,7 @@ const collision = (state) => {
         state.ballSpeedY = deltaY * (Math.random() < 0.5 ? -0.5 : 0.5);
     }
 };
+
 // Reset ball
 const ballReset = (state) => {
     if (!state) return;
@@ -219,7 +218,6 @@ io.on('connection', (socket) => {
         }
 
         const room = clientRooms.get(roomId);
-        //room.readyPlayers.add(socket.id);
         const roomSize = io.sockets.adapter.rooms.get(roomId)?.size || 0;
         const playerNumber = roomSize === 1 ? 1 : 2;
 
@@ -237,8 +235,6 @@ io.on('connection', (socket) => {
         if (room) {
             room.readyPlayers.add(socket.id);
             console.log(`Players ready in room ${roomId}:`, Array.from(room.readyPlayers));
-            //const actualRoomSize = io.sockets.adapter.rooms.get(roomId)?.size;
-            const connectedSockets = io.sockets.adapter.rooms.get(roomId)?.sockets || {};
             const roomSize = io.sockets.adapter.rooms.get(roomId)?.size || 0;
             console.log(`Total players in room ${roomId}: ${roomSize}`);
 
@@ -248,7 +244,6 @@ io.on('connection', (socket) => {
 
                 if (!room.intervalID) {
                     io.to(roomId).emit('startCountdown');
-                    //room.gameStates.waitingForPlayers = false;
                     console.log("Countdown started for room:", roomId);
                 }
             }
