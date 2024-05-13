@@ -129,7 +129,7 @@ const moveCPUPaddle = (state) => {
     let speedModifier, accuracy;
     switch (state.difficulty) {
         case "easy":
-            speedModifier = 1.0;  
+            speedModifier = 1.0;
             accuracy = 0.7;
             break;
         case "normal":
@@ -150,7 +150,7 @@ const moveCPUPaddle = (state) => {
     if (state.ballY > paddleCenter && Math.random() < accuracy) {
         state.paddle2Y = Math.min(state.paddle2Y + speedModifier * 10, TABLE_HEIGHT - PADDLE_HEIGHT); // Increase the speed modifier
     } else if (state.ballY < paddleCenter && Math.random() < accuracy) {
-        state.paddle2Y = Math.max(state.paddle2Y - speedModifier * 10, 0); 
+        state.paddle2Y = Math.max(state.paddle2Y - speedModifier * 10, 0);
     }
     //console.log(`CPU Paddle moved from ${oldY} to ${state.paddle2Y} using speed ${speedModifier} and accuracy ${accuracy}`);
 
@@ -208,15 +208,16 @@ io.on('connection', (socket) => {
         socket.join(roomId);
 
         if (!clientRooms.has(roomId)) {
+            console.log(`Initializing new room with ID: ${roomId}`)
             const gameState = initializeGameState(roomId, cpuMode);
             clientRooms.set(roomId, {
-                readyPlayers: new Set(),
+                readyPlayers: new Set([socket.id]),
                 intervalID: null,
                 cpuMode: cpuMode,
                 gameStates: gameState,
             });
-        }
-
+        } 
+        socketRooms[socket.id] = roomId;
         const room = clientRooms.get(roomId);
         const roomSize = io.sockets.adapter.rooms.get(roomId)?.size || 0;
         const playerNumber = roomSize === 1 ? 1 : 2;
@@ -225,7 +226,7 @@ io.on('connection', (socket) => {
         io.to(roomId).emit('gameUpdate', sanitizeGameState(room.gameStates));
 
         // Debugging: Log the joining details
-        console.log(`Socket ${socket.id} joined room ${roomId} as player ${playerNumber}`);
+        console.log(`Socket ${socket.id} joined room ${roomId} as player ${playerNumber}. Total in room: ${roomSize}`);
     });
 
     socket.on('playerReady', (roomId) => {
@@ -233,10 +234,17 @@ io.on('connection', (socket) => {
         const room = clientRooms.get(roomId);
 
         if (room) {
-            room.readyPlayers.add(socket.id);
+            if (!room.readyPlayers.has(socket.id)) {
+                room.readyPlayers.add(socket.id);
+                console.log(`Player ${socket.id} added to ready players.`);
+            } else {
+                console.log(`Player ${socket.id} was already marked as ready.`);
+            }
+
             console.log(`Players ready in room ${roomId}:`, Array.from(room.readyPlayers));
             const roomSize = io.sockets.adapter.rooms.get(roomId)?.size || 0;
             console.log(`Total players in room ${roomId}: ${roomSize}`);
+            console.log(`Expected ready count: ${roomSize}, Actual ready count: ${room.readyPlayers.size}`);
 
             //Check if all players are ready
             if (room.readyPlayers.size === 2) {
@@ -271,6 +279,7 @@ io.on('connection', (socket) => {
         const gameState = initializeGameState(roomId, true, difficulty); // Initialize game state with CPU mode true
         gameStates[roomId] = gameState; // 'true' for cpuMode
         socket.join(roomId);
+        socketRooms[socket.id] = roomId;
         clientRooms.set(roomId, {
             readyPlayers: new Set([socket.id]), // Automatically set this socket as ready
             intervalID: null,
@@ -338,12 +347,17 @@ io.on('connection', (socket) => {
 
     socket.on('disconnect', () => {
         console.log(`Client disconnected: ${socket.id}`);
-        const playerData = socketRooms[socket.id];
-        if (playerData) {
-            const { roomId } = playerData;
+        const roomId = socketRooms[socket.id];
+        console.log('roomId:', roomId);
+
+        if (roomId) {
             const room = clientRooms.get(roomId);
-            
+            const roomSize = io.sockets.adapter.rooms.get(roomId)?.size || 0;
+
+            console.log(`Player ${socket.id} disconnected from room ${roomId}. Room size: ${roomSize}`);
+
             if (room) {
+                console.log(`Removing player ${socket.id} from room ${roomId}`)
                 room.readyPlayers.delete(socket.id);
 
                 if (room.readyPlayers.size < 2) {
@@ -354,16 +368,27 @@ io.on('connection', (socket) => {
                     io.to(roomId).emit('playerCount', { count: room.readyPlayers.size });
                 }
 
-                if (io.sockets.adapter.rooms.get(roomId) === undefined) {
+                if (roomSize === 0) {
+                    console.log(`No players in room ${roomId}. Deleting room.`);
                     clearInterval(room.intervalID);
                     delete gameStates[roomId];
                     clientRooms.delete(roomId);
+
+                    // Remove the room from the lobbies list
+                    lobbies = lobbies.filter(lobby => lobby.id !== roomId);
+                    io.emit('updateLobbies', lobbies); // Update all clients with the new list of lobbies
+                    console.log(`Room ${roomId} deleted and lobbies updated.`);
                 }
+            } else {
+                console.log(`No player data found for disconnected socket: ${socket.id}`);
             }
         }
 
+        // Remove the socket from the socketRooms object
         delete socketRooms[socket.id];
     });
+
+
 
 });
 
