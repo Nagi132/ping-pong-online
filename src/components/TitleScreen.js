@@ -8,6 +8,7 @@ function TitleScreen() {
 
   const handlePlay = () => {
     if (username) {
+      localStorage.setItem("username", username); // Save username to local storage
       navigate("/Lobby", { state: { username } }); // Pass username to Lobby
     } else {
       alert("Please enter a username.");

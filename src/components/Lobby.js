@@ -6,13 +6,25 @@ import io from 'socket.io-client';
 const { num } = require('./difiiculty.js');
 
 function Lobby() {
-    const location = useLocation();
     const navigate = useNavigate();
-    const { username } = location.state || {};
+    const location = useLocation();
     const [lobbies, setLobbies] = useState([]);
     const [socket, setSocket] = useState(null);
 
+    // Retrieve the username from the location state or local storage
+    const [username, setUsername] = useState(localStorage.getItem('username') || ''); // Get the username from the location state
+
+
     useEffect(() => {
+        // // Get the username from the location state if it is not in the state
+        // if (!username) {
+        //     const usernameFromLocation = location.state?.username;
+        //     if (usernameFromLocation) {
+        //         setUsername(usernameFromLocation);
+        //         localStorage.setItem('username', usernameFromLocation);
+        //     }
+        // }
+
         // Connect to the socket.io server
         const newSocket = io('http://localhost:4000', {
             withCredentials: true,
@@ -36,9 +48,14 @@ function Lobby() {
         };
     }, []);
 
+    useEffect(() => {
+        console.log('Setting username: ', username);
+        localStorage.setItem('username', username);
+    }, [username]);
+
     // Create a new lobby
     const handleCreateLobby = () => {
-        if (!username) {
+        if (!username.trim()) {
             console.log('Username is undefined. Cannot create lobby.');
             return;
         }
