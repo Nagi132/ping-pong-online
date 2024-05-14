@@ -7,7 +7,6 @@ const { num } = require('./difiiculty.js');
 
 function Lobby() {
     const navigate = useNavigate();
-    const location = useLocation();
     const [lobbies, setLobbies] = useState([]);
     const [socket, setSocket] = useState(null);
 
@@ -16,15 +15,6 @@ function Lobby() {
 
 
     useEffect(() => {
-        // // Get the username from the location state if it is not in the state
-        // if (!username) {
-        //     const usernameFromLocation = location.state?.username;
-        //     if (usernameFromLocation) {
-        //         setUsername(usernameFromLocation);
-        //         localStorage.setItem('username', usernameFromLocation);
-        //     }
-        // }
-
         // Connect to the socket.io server
         const newSocket = io('http://localhost:4000', {
             withCredentials: true,
