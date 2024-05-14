@@ -1,4 +1,4 @@
-require ('dotenv').config();
+require('dotenv').config();
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
@@ -19,17 +19,17 @@ const allowedOrigins = process.env.NODE_ENV === 'production'
 
 const io = socketIo(server, {
     cors: {
-        origin: 'http://localhost:3000',
+        origin: process.env.NODE_ENV === 'production' ? 'https://pingpong-ctp.herokuapp.com' : 'http://localhost:3000',
         methods: ['GET', 'POST'],
         allowedHeaders: ['my-custom-header'],
         credentials: true
     }
 });
 
-app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
-
-const PORT = process.env.PORT || 4000;
-server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.use(cors({
+    origin: process.env.NODE_ENV === 'production' ? 'https://pingpong-ctp.herokuapp.com' : 'http://localhost:3000',
+    credentials: true
+}));
 
 // Constants for game dimensions and other settings
 const TABLE_WIDTH = 1000;
@@ -330,7 +330,7 @@ io.on('connection', (socket) => {
 
                 // Reset the game state
                 room.gameStates = initializeGameState(roomId, room.gameStates.cpuMode, room.gameStates.difficulty);
-                
+
                 // Should start the Countdown 
                 io.to(roomId).emit('rematchAccepted');// Broadcast rematch accepted
             }
@@ -427,4 +427,5 @@ io.on('connection', (socket) => {
 
 });
 
-
+const PORT = process.env.PORT || 4000;
+server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
