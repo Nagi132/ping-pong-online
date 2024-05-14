@@ -6,6 +6,7 @@ const { v4: uuidv4 } = require('uuid');// Random id generator
 const util = require('util');
 const { act } = require('react');
 const { read } = require('fs');
+const { clear } = require('console');
 
 const app = express();
 const server = http.createServer(app);
@@ -27,7 +28,6 @@ const PADDLE_HEIGHT = 100;
 const PADDLE_THICKNESS = 10;
 const WINNING_SCORE = 5;
 
-
 let lobbies = [];
 const gameStates = {};
 const intervalIDs = {};
@@ -48,6 +48,7 @@ const initializeGameState = (roomId, cpuMode = false, difficulty = "easy") => {
         difficulty: difficulty, // Difficulty of the CPU
         waitingForPlayers: true, // Whether the game is waiting for players
         readyPlayers: new Set(), // Set of players ready to play
+        rematchVotes: new Set(), // Set of players who voted for a rematch
     };
 };
 
@@ -122,7 +123,6 @@ const updateGameState = (roomId) => {
 
     io.to(roomId).emit('gameUpdate', sanitizeGameState(state));
 };
-
 
 // Move CPU Paddle based on difficulty
 const moveCPUPaddle = (state) => {
@@ -211,12 +211,12 @@ io.on('connection', (socket) => {
             console.log(`Initializing new room with ID: ${roomId}`)
             const gameState = initializeGameState(roomId, cpuMode);
             clientRooms.set(roomId, {
-                readyPlayers: new Set([socket.id]),
+                readyPlayers: new Set(),
                 intervalID: null,
                 cpuMode: cpuMode,
                 gameStates: gameState,
             });
-        } 
+        }
         socketRooms[socket.id] = roomId;
         const room = clientRooms.get(roomId);
         const roomSize = io.sockets.adapter.rooms.get(roomId)?.size || 0;
@@ -258,11 +258,19 @@ io.on('connection', (socket) => {
         }
     });
 
+    socket.on('initializeGameState', (roomId) => {
+        gameStates[roomId] = initializeGameState(roomId);
+        console.log(`Game state initialized for room ${roomId}`);
+    });
+
     socket.on('startGame', (roomId) => {
         console.log("Received startGame request for roomId:", roomId);
 
         const room = clientRooms.get(roomId);
-        if (room && !room.intervalID) {
+        if (room) {
+            if (room.intervalID) {
+                clearInterval(room.intervalID); // Ensure no duplicate intervals
+            }
             console.log("Starting game for room:", roomId);
             room.intervalID = setInterval(() => updateGameState(roomId), 1000 / 40);
             room.gameStates.waitingForPlayers = false;
@@ -296,6 +304,26 @@ io.on('connection', (socket) => {
         if (gameStates[roomId]) {
             initializeGameState(roomId, gameStates[roomId].cpuMode); // Reinitialize the game state
             io.to(roomId).emit('gameUpdate', sanitizeGameState(gameStates[roomId])); // Broadcast updated state
+        }
+    });
+
+    socket.on('rematchAccepted', (roomId) => {
+        console.log('Rematch requested');
+        const room = clientRooms.get(roomId);
+
+        if (room) {
+            room.gameStates.rematchVotes.add(socket.id);
+            console.log(`Player ${socket.id} voted for a rematch in room ${roomId}. Total votes: ${room.gameStates.rematchVotes.size}`);
+            if (room.gameStates.rematchVotes.size === 2) {
+                console.log('All players voted for a rematch. Starting rematch.');
+                clearInterval(room.intervalID);
+
+                // Reset the game state
+                room.gameStates = initializeGameState(roomId, room.gameStates.cpuMode, room.gameStates.difficulty);
+                
+                // Should start the Countdown 
+                io.to(roomId).emit('rematchAccepted');// Broadcast rematch accepted
+            }
         }
     });
 
@@ -383,12 +411,9 @@ io.on('connection', (socket) => {
                 console.log(`No player data found for disconnected socket: ${socket.id}`);
             }
         }
-
         // Remove the socket from the socketRooms object
         delete socketRooms[socket.id];
     });
-
-
 
 });
 

@@ -27,6 +27,10 @@ const Gameplay = () => {
     const urlRoomId = location.pathname.split('/')[2];
     const [roomId, setRoomId] = useState(urlRoomId);// get room id from url
     const [isCPUmode, setIsCPUMode] = useState(mode === 'cpu');
+    const [winner, setWinner] = useState(false);
+    // player scoring; winning score is 3
+    const [player1Score, setPlayer1Score] = useState(0);
+    const [player2Score, setPlayer2Score] = useState(0);
     const [ready, setReady] = useState(false);
 
     const socket = useRef(null);// socket connection
@@ -93,7 +97,6 @@ const Gameplay = () => {
             setTime(5); // Reset the countdown
         });
 
-
         // Listen for game updates
         newSocket.on('gameUpdate', (newGameState) => {
             setGameState(newGameState);
@@ -103,6 +106,17 @@ const Gameplay = () => {
             }
         });
 
+        newSocket.on('rematchAccepted', () => {
+            console.log("Rematch accepted. Starting new game...");
+
+            setGameActive(false); // Dectivate the game
+            setWinner(false); // Reset the winner state
+            setPlayer1Score(0);
+            setPlayer2Score(0);
+            setCountdownActive(true); // Start the countdown
+            newSocket.emit('initializeGameState', roomId); // Signal the server to start the game
+        });
+
         return () => {
             newSocket.off('cpuGameStarted');
             newSocket.off('playerCount');
@@ -110,9 +124,10 @@ const Gameplay = () => {
             newSocket.off('startCountdown');
             newSocket.off('stopCountdown');
             newSocket.off('gameUpdate');
+            newSocket.off('rematchAccepted');
             newSocket.disconnect();
         };
-    }, [isCPUmode]);
+    }, [isCPUmode, roomId, setRoomId, setGameActive, setCountdownActive, setWinner, setPlayer1Score, setPlayer2Score, setTime]);
 
     useEffect(() => {
         let interval = null;
@@ -224,118 +239,14 @@ const Gameplay = () => {
     const TABLE_WIDTH = 1000;
     const TABLE_HEIGHT = 600;
 
-
-    //ball speed and cpu speed modifier for difficulties
-    // var speedModifier = 0;
-    // var accuracy = 0;
-
-    // ball x and y positions; vertical and horizontaly speed
-    // const [ballX, setBallX] = useState(500);
-    // const [ballY, setBallY] = useState(300);
-    // const [ballSpeedX, setBallSpeedX] = useState(15);
-    // const [ballSpeedY, setBallSpeedY] = useState(15);
-
     // paddles for player 1 and 2; constant paddle size
     const [paddle1Y, setPaddle1Y] = useState(350);
     //const [paddle2Y, setPaddle2Y] = useState(350);
     const PADDLE_HEIGHT = 100; //starts from top then adds to bottom
     const PADDLE_THICKNESS = 10;
 
-    // mouse movement
-    //const [mousePosition, setMousePosition] = useState({ x: null, y: null });
 
-    // player scoring; winning score is 3
-    const [player1Score, setPlayer1Score] = useState(0);
-    const [player2Score, setPlayer2Score] = useState(0);
-    const [winner, setWinner] = useState(false);
     const WINNING_SCORE = 5;
-
-    // function for ball movement
-    // const ballMovement = () => {
-    //     // sets ball velocity
-    //     if (num.dif != "off") {
-    //         setBallX(x => x += ballSpeedX * speedModifier + hitCount / 4);
-    //         setBallY(y => y += ballSpeedY * speedModifier + hitCount / 4);
-    //     }
-    // };
-    // const collision = () => {
-    //     console.log("collision in gameplay");
-    //     // when ball reaches top or bottom of screen, reverse direction
-    //     if (ballY + ballSpeedY < 0 || ballY + ballSpeedY > TABLE_HEIGHT) {
-    //         setBallSpeedY(-ballSpeedY);
-    //     }
-
-    //     // when ball collides with cpu. (if the ballY is at the same height as the top of the cpu paddle or lower,
-    //     //and ballY at the same height as the bottom of the cpu paddle or higher, then collide with it,
-    //     //+ or - 20 to the paddle height range to add leniency to the collision tracking)
-    //     //
-    //     if (ballX > TABLE_WIDTH && ballY >= paddle2Y - 30 && ballY <= paddle2Y + PADDLE_HEIGHT + 30) {
-    //         setBallX(x => x - 20);
-    //         setBallSpeedX(speedX => speedX * -1);
-    //         let deltaY = ballY - (paddle2Y + PADDLE_HEIGHT / 2);
-    //         setBallSpeedY(deltaY * (Math.random() < 0.5 ? -.5 : .5));
-    //         hitCount++;
-    //     }
-    //     //when ball collides with player, same logic as cpu collision 
-    //     else if (ballX < 0 && ballY > paddle1Y - 30 && ballY < paddle1Y + PADDLE_HEIGHT + 40) {
-    //         setBallX(x => x + 20);
-    //         setBallSpeedX(speedX => speedX * -1);
-    //         let deltaY = ballY - (paddle1Y + PADDLE_HEIGHT / 2);
-    //         setBallSpeedY(deltaY * (Math.random() < 0.5 ? -.5 : .5));
-
-    //         hitCount++;
-    //     }
-
-    //     //when ball reaches left or right edge, add a point and reset
-    //     else if (ballX < 0) {
-    //         setPlayer2Score(s => s + 1);
-    //         ballReset();
-    //         hitCount = 0;
-    //     }
-    //     else if (ballX > TABLE_WIDTH) {
-    //         setPlayer1Score(s => s + 1);
-    //         ballReset();
-    //         hitCount = 0;
-    //     }
-    // }
-    // when wall collision occurs
-    // const ballReset = () => {
-    //     setBallX(500);
-    //     setBallY(300);
-    //     setBallSpeedX(-ballSpeedX);
-    // }
-
-    //computer movement
-    // const computerMovement = () => {
-    //     if (isCPUmode) {
-    //         // Check which difficulty is selected and adjust the CPU paddle movement accordingly
-    //         switch (num.dif) {
-    //             case "easy":
-    //                 moveCPUPaddle(0.3, 0.3); // Lower speed and accuracy for easy mode
-    //                 break;
-    //             case "normal":
-    //                 moveCPUPaddle(0.43, 0.2); // Medium speed and accuracy for normal mode
-    //                 break;
-    //             case "hard":
-    //                 moveCPUPaddle(0.7, 0.1); // Higher speed and accuracy for hard mode
-    //                 break;
-    //             default:
-    //                 // Default behavior if no difficulty is selected
-    //                 moveCPUPaddle(0.3, 0.3); // You can adjust these values as needed
-    //         }
-    //     }
-    // };
-
-    // const moveCPUPaddle = (speedModifier, accuracy) => {
-    //     // Implement the logic to move the CPU paddle based on the ball's position and the given speed and accuracy
-    //     const paddleCenter = paddle2Y + PADDLE_HEIGHT / 2;
-    //     if (ballY > paddleCenter && Math.random() < accuracy) {
-    //         setPaddle2Y(y => Math.min(y + speedModifier * 5, TABLE_HEIGHT - PADDLE_HEIGHT));
-    //     } else if (ballY < paddleCenter && Math.random() < accuracy) {
-    //         setPaddle2Y(y => Math.max(y - speedModifier * 5, 0));
-    //     }
-    // };
-
 
     const replay = () => {
         if (winner) {
@@ -455,6 +366,7 @@ const Gameplay = () => {
         }
     }, [player1Score, player2Score]);
 
+
     // Draw table and net
     const drawStaticElements = (context) => {
         context.fillStyle = '#00A650';
@@ -472,6 +384,11 @@ const Gameplay = () => {
         context.beginPath();
         context.arc(gameState.ballX, gameState.ballY, 10, 0, Math.PI * 2, true);
         context.fill();
+    };
+
+    const handleRequestMatch = () => {
+        console.log("Requesting rematch...");
+        socket.current.emit('rematchAccepted', roomId);
     };
 
     return (
@@ -543,6 +460,12 @@ const Gameplay = () => {
                     )}
                 </div>
             )}
+            {!isCPUmode && winner && (
+                <div className='d-flex justify-content-between mt-5'>
+                    <button className="btn btn-purple" onClick={handleRequestMatch}>Request Match</button>
+                </div>
+            )}
+
         </div>
     );
 }
