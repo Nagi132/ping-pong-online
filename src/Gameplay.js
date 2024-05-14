@@ -60,7 +60,7 @@ const Gameplay = () => {
     }
 
     useEffect(() => {
-        const newSocket = io('http://localhost:4000');
+        const newSocket = io(process.env.NODE_ENV === 'production' ? 'https://pingpong-ctp.herokuapp.com' : 'http://localhost:4000');
         socket.current = newSocket;
         console.log("Socket initialized and connecting...");
         console.log("Mode in useEffect:", mode);

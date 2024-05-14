@@ -1,3 +1,4 @@
+require ('dotenv').config();
 const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
@@ -10,6 +11,12 @@ const { clear } = require('console');
 
 const app = express();
 const server = http.createServer(app);
+
+// Determine the appropriate origin for CORS based on the environment
+const allowedOrigins = process.env.NODE_ENV === 'production'
+    ? ['https://pingpong-ctp.herokuapp.com']
+    : ['http://localhost:3000'];
+
 const io = socketIo(server, {
     cors: {
         origin: 'http://localhost:3000',
@@ -20,6 +27,9 @@ const io = socketIo(server, {
 });
 
 app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
+
+const PORT = process.env.PORT || 4000;
+server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
 // Constants for game dimensions and other settings
 const TABLE_WIDTH = 1000;
@@ -417,5 +427,4 @@ io.on('connection', (socket) => {
 
 });
 
-const PORT = process.env.PORT || 4000;
-server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
