@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const http = require('http');
+const path = require('path');
 const socketIo = require('socket.io');
 const cors = require('cors');
 const { v4: uuidv4 } = require('uuid');// Random id generator
@@ -31,14 +32,12 @@ app.use(cors({
     credentials: true
 }));
 
-// Serve static files from the React app in production
-if (process.env.NODE_ENV === 'production') {
-    app.use(express.static(path.join(__dirname, '..', 'build')));
-    app.get('*', (req, res) => {
-        res.sendFile(path.resolve(__dirname, '..', 'build', 'index.html'));
-    });
-}
+// Serve static files from the React app
+app.use(express.static(path.join(__dirname, '../build')));
 
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../build', 'index.html'));
+});
 // Constants for game dimensions and other settings
 const TABLE_WIDTH = 1000;
 const TABLE_HEIGHT = 600;
@@ -435,5 +434,5 @@ io.on('connection', (socket) => {
 
 });
 
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
