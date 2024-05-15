@@ -19,7 +19,7 @@ const allowedOrigins = process.env.NODE_ENV === 'production'
 
 const io = socketIo(server, {
     cors: {
-        origin: process.env.NODE_ENV === 'production' ? 'https://pingpong-ctp.herokuapp.com' : 'http://localhost:3000',
+        origin: allowedOrigins,
         methods: ['GET', 'POST'],
         allowedHeaders: ['my-custom-header'],
         credentials: true
@@ -27,9 +27,17 @@ const io = socketIo(server, {
 });
 
 app.use(cors({
-    origin: process.env.NODE_ENV === 'production' ? 'https://pingpong-ctp.herokuapp.com' : 'http://localhost:3000',
+    origin: allowedOrigins,
     credentials: true
 }));
+
+// Serve static files from the React app in production
+if (process.env.NODE_ENV === 'production') {
+    app.use(express.static(path.join(__dirname, '..', 'build')));
+    app.get('*', (req, res) => {
+        res.sendFile(path.resolve(__dirname, '..', 'build', 'index.html'));
+    });
+}
 
 // Constants for game dimensions and other settings
 const TABLE_WIDTH = 1000;
