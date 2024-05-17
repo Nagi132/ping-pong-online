@@ -1,10 +1,10 @@
-import React, { useEffect, useRef, useState, useLayoutEffect, startTransition } from 'react';
-import { Outlet, Link, useLocation } from "react-router-dom";
+//require('dotenv').config();
+import React, { useEffect, useRef, useState, useLayoutEffect} from 'react';
+import { Link, useLocation } from "react-router-dom";
 import { debounce } from 'lodash';
 import io from 'socket.io-client';
 import './index.css';
 import './Gameplay.css';
-import { is } from '@babel/types';
 
 const { num } = require('./components/difiiculty.js');
 
@@ -12,7 +12,7 @@ const { num } = require('./components/difiiculty.js');
 var temp = "";
 
 var paused = false;
-var hitCount = 0;
+//var hitCount = 0;
 
 const Gameplay = () => {
     const [time, setTime] = useState(5);
@@ -60,7 +60,14 @@ const Gameplay = () => {
     }
 
     useEffect(() => {
-        const newSocket = io(process.env.NODE_ENV === 'production' ? 'https://pingpong-ctp.herokuapp.com' : 'http://localhost:4000');
+        const newSocket = io(process.env.NODE_ENV === 'production' ? 'https://pingpong-ctp.herokuapp.com' : 'http://localhost:4000',
+            {
+                withCredentials: true,
+                extraHeaders: {
+                    "my-custom-header": "abcd"
+                }
+            }
+        );
         socket.current = newSocket;
         console.log("Socket initialized and connecting...");
         console.log("Mode in useEffect:", mode);
@@ -127,7 +134,7 @@ const Gameplay = () => {
             newSocket.off('rematchAccepted');
             newSocket.disconnect();
         };
-    }, [isCPUmode, roomId, setRoomId, setGameActive, setCountdownActive, setWinner, setPlayer1Score, setPlayer2Score, setTime]);
+    }, [isCPUmode]);
 
     useEffect(() => {
         let interval = null;

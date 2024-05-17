@@ -1,43 +1,26 @@
-require('dotenv').config();
 const express = require('express');
 const http = require('http');
-const path = require('path');
 const socketIo = require('socket.io');
 const cors = require('cors');
 const { v4: uuidv4 } = require('uuid');// Random id generator
-const util = require('util');
-const { act } = require('react');
-const { read } = require('fs');
-const { clear } = require('console');
+// const util = require('util');
+// const { act } = require('react');
+// const { read } = require('fs');
+// const { clear } = require('console');
 
 const app = express();
 const server = http.createServer(app);
-
-// Determine the appropriate origin for CORS based on the environment
-const allowedOrigins = process.env.NODE_ENV === 'production'
-    ? ['https://pingpong-ctp.herokuapp.com']
-    : ['http://localhost:3000'];
-
 const io = socketIo(server, {
     cors: {
-        origin: allowedOrigins,
+        origin: 'http://localhost:3000',
         methods: ['GET', 'POST'],
         allowedHeaders: ['my-custom-header'],
         credentials: true
     }
 });
 
-app.use(cors({
-    origin: allowedOrigins,
-    credentials: true
-}));
+app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
 
-// Serve static files from the React app
-app.use(express.static(path.join(__dirname, '../build')));
-
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../build', 'index.html'));
-});
 // Constants for game dimensions and other settings
 const TABLE_WIDTH = 1000;
 const TABLE_HEIGHT = 600;
@@ -47,7 +30,7 @@ const WINNING_SCORE = 5;
 
 let lobbies = [];
 const gameStates = {};
-const intervalIDs = {};
+//const intervalIDs = {};
 
 // Function to initiazlize the game for a new room
 const initializeGameState = (roomId, cpuMode = false, difficulty = "easy") => {
@@ -337,7 +320,7 @@ io.on('connection', (socket) => {
 
                 // Reset the game state
                 room.gameStates = initializeGameState(roomId, room.gameStates.cpuMode, room.gameStates.difficulty);
-
+                
                 // Should start the Countdown 
                 io.to(roomId).emit('rematchAccepted');// Broadcast rematch accepted
             }
@@ -434,5 +417,5 @@ io.on('connection', (socket) => {
 
 });
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 4000;
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
