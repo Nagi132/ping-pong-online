@@ -16,12 +16,6 @@ function Lobby() {
 
     useEffect(() => {
         // Connect to the socket.io server
-        // const newSocket = io('http://localhost:4000', {
-        //     withCredentials: true,
-        //     extraHeaders: {
-        //         'my-custom-header': 'abcd'
-        //     }
-        // });
         const newSocket = io(process.env.NODE_ENV === 'production' ? 'https://pingpong-ctp-73fcef00d90d.herokuapp.com' : 'http://localhost:4000',
         {
             withCredentials: true,

@@ -8,14 +8,6 @@ import Lobby from './components/Lobby';
 import GameplayMenu from "./GameplayMenu";
 import io from 'socket.io-client';
 
-
-//const socket = io('http://localhost:4000'); // Connects to socket.io server
-// const socket = io('http://localhost:4000', {
-//   withCredentials: true,
-//   extraHeaders: {
-//       'my-custom-header': 'abcd'
-//   }
-// });
 const socket = io(process.env.NODE_ENV === 'production' ? 'https://pingpong-ctp-73fcef00d90d.herokuapp.com' : 'http://localhost:4000',
   {
     withCredentials: true,

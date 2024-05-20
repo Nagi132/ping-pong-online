@@ -5,10 +5,6 @@ const path = require('path');
 const socketIo = require('socket.io');
 const cors = require('cors');
 const { v4: uuidv4 } = require('uuid');// Random id generator
-const util = require('util');
-const { act } = require('react');
-const { read } = require('fs');
-const { clear } = require('console');
 
 const app = express();
 const server = http.createServer(app);
@@ -24,24 +20,10 @@ const corsOptions = {
 console.log('Allowed Origins:', allowedOrigins);
 app.use(cors(corsOptions));
 app.use((req, res, next) => {
-    console.log('Received request from origin:', req.headers.origin);
-    console.log('Received headers:', req.headers);
+    // console.log('Received request from origin:', req.headers.origin);
+    // console.log('Received headers:', req.headers);
     next();
 });
-// app.use(cors({
-//     origin: allowedOrigins,
-//       methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-//       allowedHeaders: ['Content-Type', 'Authorization', 'my-custom-header'],
-//     credentials: true
-// }));
-// app.use((req, res, next) => {
-//     res.header("Access-Control-Allow-Origin", "*"); // or dynamically from `req.headers.origin`
-//     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization, my-custom-header");
-//     res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-//     res.header("Access-Control-Allow-Credentials", "true");
-//     next();
-// });
-
 
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, '../build')));
