@@ -14,29 +14,44 @@ const app = express();
 const server = http.createServer(app);
 
 // Determine the appropriate origin for CORS based on the environment
-const allowedOrigins = process.env.NODE_ENV === 'production'
-    ? ['https://pingpong-ctp.herokuapp.com']
-    : ['http://localhost:3000'];
-
-const io = socketIo(server, {
-    cors: {
-        origin: allowedOrigins,
-        methods: ['GET', 'POST'],
-        allowedHeaders: ['my-custom-header'],
-        credentials: true
-    }
+const allowedOrigins = process.env.NODE_ENV === 'production' ? 'https://pingpong-ctp-73fcef00d90d.herokuapp.com' : ['http://localhost:4000']
+const corsOptions = {
+    origin: ['http://localhost:4000', 'https://pingpong-ctp-73fcef00d90d.herokuapp.com'],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "my-custom-header"],
+    credentials: true,
+};
+console.log('Allowed Origins:', allowedOrigins);
+app.use(cors(corsOptions));
+app.use((req, res, next) => {
+    console.log('Received request from origin:', req.headers.origin);
+    console.log('Received headers:', req.headers);
+    next();
 });
+// app.use(cors({
+//     origin: allowedOrigins,
+//       methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+//       allowedHeaders: ['Content-Type', 'Authorization', 'my-custom-header'],
+//     credentials: true
+// }));
+// app.use((req, res, next) => {
+//     res.header("Access-Control-Allow-Origin", "*"); // or dynamically from `req.headers.origin`
+//     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization, my-custom-header");
+//     res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+//     res.header("Access-Control-Allow-Credentials", "true");
+//     next();
+// });
 
-app.use(cors({
-    origin: allowedOrigins,
-    credentials: true
-}));
 
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, '../build')));
 
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '../build', 'index.html'));
+});
+
+const io = socketIo(server, {
+    cors: corsOptions
 });
 // Constants for game dimensions and other settings
 const TABLE_WIDTH = 1000;

@@ -60,14 +60,29 @@ const Gameplay = () => {
     }
 
     useEffect(() => {
-        const newSocket = io(process.env.NODE_ENV === 'production' ? 'https://pingpong-ctp.herokuapp.com' : 'http://localhost:4000',
-            {
-                withCredentials: true,
+        // const newSocket = io('http://localhost:4000', {
+        //     withCredentials: true,
+        //     extraHeaders: {
+        //         'my-custom-header': 'abcd'
+        //     }
+        // });
+        const newSocket = io(process.env.NODE_ENV === 'production' ? 'https://pingpong-ctp-73fcef00d90d.herokuapp.com' : 'http://localhost:4000',
+        {
+            withCredentials: true,
+            transportOptions: {
+              polling: {
                 extraHeaders: {
-                    "my-custom-header": "abcd"
+                  "my-custom-header": "abcd"
                 }
+              }
             }
-        );
+          });
+          console.log('Connected to the server3');
+
+          newSocket.on('connect_error', (error) => {
+            console.log('Connection Error from Gameplay.js:', error);
+        });
+        
         socket.current = newSocket;
         console.log("Socket initialized and connecting...");
         console.log("Mode in useEffect:", mode);

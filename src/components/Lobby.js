@@ -16,12 +16,29 @@ function Lobby() {
 
     useEffect(() => {
         // Connect to the socket.io server
-        const newSocket = io('http://localhost:4000', {
+        // const newSocket = io('http://localhost:4000', {
+        //     withCredentials: true,
+        //     extraHeaders: {
+        //         'my-custom-header': 'abcd'
+        //     }
+        // });
+        const newSocket = io(process.env.NODE_ENV === 'production' ? 'https://pingpong-ctp-73fcef00d90d.herokuapp.com' : 'http://localhost:4000',
+        {
             withCredentials: true,
-            extraHeaders: {
-                'my-custom-header': 'abcd'
+            transportOptions: {
+              polling: {
+                extraHeaders: {
+                  "my-custom-header": "abcd"
+                }
+              }
             }
+          });
+          console.log('Connected to the server2');
+
+          newSocket.on('connect_error', (error) => {
+            console.log('Connection Error from Lobby.js:', error);
         });
+        
         setSocket(newSocket);
 
         newSocket.on('connect', () => {

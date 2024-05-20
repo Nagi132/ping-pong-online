@@ -9,12 +9,33 @@ import GameplayMenu from "./GameplayMenu";
 import io from 'socket.io-client';
 
 
-const socket = io('http://localhost:4000'); // Connects to socket.io server
+//const socket = io('http://localhost:4000'); // Connects to socket.io server
+// const socket = io('http://localhost:4000', {
+//   withCredentials: true,
+//   extraHeaders: {
+//       'my-custom-header': 'abcd'
+//   }
+// });
+const socket = io(process.env.NODE_ENV === 'production' ? 'https://pingpong-ctp-73fcef00d90d.herokuapp.com' : 'http://localhost:4000',
+  {
+    withCredentials: true,
+    transportOptions: {
+      polling: {
+        extraHeaders: {
+          "my-custom-header": "abcd"
+        }
+      }
+    }
+  });
 
 function App() {
   useEffect(() => {
     socket.on('connect', () => {
       console.log('Connected to the server');
+    });
+    console.log('Connected to the server');
+    socket.on('connect_error', (error) => {
+      console.log('Connection Error from index.js:', error);
     });
 
     // Cleanup function for disconnecting from the server
