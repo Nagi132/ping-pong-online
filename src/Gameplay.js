@@ -1,5 +1,5 @@
 //require('dotenv').config();
-import React, { useEffect, useRef, useState, useLayoutEffect} from 'react';
+import React, { useEffect, useRef, useState, useLayoutEffect } from 'react';
 import { Link, useLocation } from "react-router-dom";
 import { debounce } from 'lodash';
 import io from 'socket.io-client';
@@ -61,22 +61,22 @@ const Gameplay = () => {
 
     useEffect(() => {
         const newSocket = io(process.env.NODE_ENV === 'production' ? 'https://pingpong-ctp-73fcef00d90d.herokuapp.com' : 'http://localhost:4000',
-        {
-            withCredentials: true,
-            transportOptions: {
-              polling: {
-                extraHeaders: {
-                  "my-custom-header": "abcd"
+            {
+                withCredentials: true,
+                transportOptions: {
+                    polling: {
+                        extraHeaders: {
+                            "my-custom-header": "abcd"
+                        }
+                    }
                 }
-              }
-            }
-          });
-          console.log('Connected to the server3');
+            });
+        console.log('Connected to the server3');
 
-          newSocket.on('connect_error', (error) => {
+        newSocket.on('connect_error', (error) => {
             console.log('Connection Error from Gameplay.js:', error);
         });
-        
+
         socket.current = newSocket;
         console.log("Socket initialized and connecting...");
         console.log("Mode in useEffect:", mode);
@@ -122,9 +122,9 @@ const Gameplay = () => {
             }
         });
 
-        newSocket.on('rematchRequested', ({requester}) => {
+        newSocket.on('rematchRequested', ({ requester }) => {
             console.log("Rematch requested by", requester);
-            if(!newSocket.id === requester) {
+            if (requester !== newSocket.id) {
                 console.log(newSocket.id, "requested a rematch. Waiting for opponent to accept.")
                 alert('Your opponent has requested a rematch. Click the button to accept.');
             }
