@@ -124,7 +124,8 @@ const Gameplay = () => {
 
         newSocket.on('rematchRequested', ({requester}) => {
             console.log("Rematch requested by", requester);
-            if(newSocket.id === requester) {
+            if(!newSocket.id === requester) {
+                console.log(newSocket.id, "requested a rematch. Waiting for opponent to accept.")
                 alert('Your opponent has requested a rematch. Click the button to accept.');
             }
         });

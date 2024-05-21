@@ -321,7 +321,7 @@ io.on('connection', (socket) => {
     });
 
     socket.on('rematchAccepted', (roomId) => {
-        console.log('Rematch requested1');
+        console.log('Rematch requested');
         const room = clientRooms.get(roomId);
 
         if (room) {
