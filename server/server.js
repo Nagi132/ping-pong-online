@@ -328,8 +328,9 @@ io.on('connection', (socket) => {
             room.gameStates.rematchVotes.add(socket.id);
             console.log(`Player ${socket.id} voted for a rematch in room ${roomId}. Total votes: ${room.gameStates.rematchVotes.size}`);
 
+            if(!room.gameStates.rematchVotes.has(socket.id)) {  
             socket.to(roomId).emit('rematchRequested', { requester: socket.id });
-
+            }
             if (room.gameStates.rematchVotes.size === 2) {
                 console.log('All players voted for a rematch. Starting rematch.');
                 clearInterval(room.intervalID);
