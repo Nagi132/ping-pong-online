@@ -50,14 +50,14 @@ const Gameplay = () => {
 
     // Visibility on difficulty buttons
     useEffect(() => {
+        const detectKeyDown = (e) => {
+            console.log("key clicked " + e.key);
+            console.log("pausing game now");
+            handlePause();
+        }
         document.addEventListener('keydown', detectKeyDown, true)
     }, [])
 
-    const detectKeyDown = (e) => {
-        console.log("key clicked " + e.key);
-        console.log("pausing game now");
-        handlePause();
-    }
 
     useEffect(() => {
         const newSocket = io(process.env.NODE_ENV === 'production' ? 'https://pingpong-ctp-73fcef00d90d.herokuapp.com' : 'http://localhost:4000',
@@ -293,7 +293,8 @@ const Gameplay = () => {
         console.log("paused " + paused);
         if (!paused) {
             console.log("Game resumed with difficulty:", temp);
-            activateCountdown(temp); // Resume with the previous difficulty setting
+            setGameActive(true);
+            //setCountdownActive(true);
         } else {
             temp = num.dif; // Save the current difficulty setting before pausing
             num.dif = "off";
@@ -425,7 +426,7 @@ const Gameplay = () => {
 
                 {/* Difficulty Buttons: Only show when in CPU mode */}
                 {isCPUmode && !gameActive && visible && (
-                    <div>
+                    <div className='difficulty'>
                         <header className="game-lobby-header">
                             <h1 className="game-lobby-title">Choose a difficulty</h1>
                         </header>
@@ -467,7 +468,7 @@ const Gameplay = () => {
 
             {/* pause buttons */}
 
-            {isCPUmode && (
+            {isCPUmode && !gameActive && (
                 <div className="pause-buttons mt-5">
                     {!paused ? (
                         <button className='btn btn-purple lowered' onClick={handlePause}>Pause</button>
