@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './Lobby.css';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import io from 'socket.io-client';
 
 const { num } = require('./difiiculty.js');
@@ -11,7 +11,7 @@ function Lobby() {
     const [socket, setSocket] = useState(null);
 
     // Retrieve the username from the location state or local storage
-    const [username, setUsername] = useState(localStorage.getItem('username') || ''); // Get the username from the location state
+    const [username] = useState(localStorage.getItem('username') || ''); // Get the username from the location state
 
 
     useEffect(() => {
@@ -84,7 +84,6 @@ function Lobby() {
             <div className="lobby-background">
                 <header className="game-lobby-header">
                     <h1 className="game-lobby-title">GAME LOBBY</h1>
-                    <h2></h2>
                 </header>
 
                 <div className="player-section">
