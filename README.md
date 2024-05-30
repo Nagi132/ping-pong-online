@@ -31,18 +31,26 @@ As the name suggests, Ping Pong Online is an interactive multiplayer ping pong w
 ### Installation
 
 1. **Clone the repository**:  
-    `git clone https://github.com/yourusername/ping-pong-online.git`  
-    `cd ping-pong-online`
+```sh
+git clone https://github.com/yourusername/ping-pong-online.git  
+cd ping-pong-online
+```
 
 2. **Install project dependencies:**:  
-    `npm install`
+```sh
+npm install
+```
 
 3. **Create a .env file and set the port number**:  
-    `PORT=3000`
+```sh
+PORT=3000
+```
 
 ### Run the Application
 - Start the app in development mode:  
-    `npm run start-dev`  
+```sh
+npm run start-dev
+```  
 Visit `http://localhost:3000/` to play the game.
 
 ## Ackowledgments

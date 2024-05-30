@@ -1,35 +1,21 @@
-name: CI
+name: Build and Deploy
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [18.x, 20.x]  
+  build-and-deploy:
+    runs-on: windows-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4  
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4  
-        with:
-          node-version: ${{ matrix.node-version }}
-
+      - name: Checkout code
+        uses: actions/checkout@v4
       - name: Install dependencies
         run: npm install
-
       - name: Build the application
         run: npm run build
-
-      - name: Start the server (background)
-        run: npm run start-server &
-        
+      - name: Start the server
+        run: npm run start-server
       - name: Start the client
         run: npm run start-client

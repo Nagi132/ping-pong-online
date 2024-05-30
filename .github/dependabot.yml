@@ -4,7 +4,8 @@ updates:
     directory: "/" # Location of package.json
     schedule:
       interval: "daily"
+      labels: "dependencies"
   - package-ecosystem: "github-actions"
-    directory: "/" # Location of GitHub Actions workflows
+    directory: .github/workflows
     schedule:
       interval: "daily"
