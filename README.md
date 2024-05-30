@@ -1,14 +1,13 @@
 # Ping Pong Online
 ![Build Status](https://github.com/Nagi132/ping-pong-online/actions/workflows/main.yml/badge.svg)
-[![Coverage Status](https://coveralls.io/repos/github/Nagi132/ping-pong-online/badge.svg?branch=main)](https://coveralls.io/github/Nagi132/ping-pong-online?branch=main)
-[![Code Quality](https://api.codeclimate.com/v1/badges/id/maintainability)](https://codeclimate.com/github/Nagi132/ping-pong-online/maintainability)
-[![Dependencies Status](https://david-dm.org/Nagi132/ping-pong-online/status.svg)](https://david-dm.org/Nagi132/ping-pong-online)
+[![Dependencies Status](https://david-dm.org/Nagi132/ping-pong-online.svg)](https://david-dm.org/Nagi132/ping-pong-online)
+
 
 ## Executive Summary
 As the name suggests, Ping Pong Online is an interactive multiplayer ping pong web game. This application was made to be easily accessible so that anyone could play. With an online multiplayer option, users can connect with others and engage in a simple yet fun experience. The game is designed to be straightforward and intuitive so that anyone can easily pass the time with it. Users of this site should have fun with the game and feel relaxed while bonding with each other. Overall, this application is designed to be simple, intuitive, and quick to play, attracting individuals who might not consider themselves gamers but are looking for a fun and engaging way to take a break or connect with others.
 
 ## Technologies and Libraries
-### Frontend
+
 ### Frontend
 - **React.js**
   - Dynamic UI with efficient state management.
