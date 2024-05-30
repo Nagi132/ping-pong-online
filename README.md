@@ -1,7 +1,5 @@
 # Ping Pong Online
 ![Build Status](https://github.com/Nagi132/ping-pong-online/actions/workflows/main.yml/badge.svg)
-[![Dependencies Status](https://david-dm.org/Nagi132/ping-pong-online.svg)](https://david-dm.org/Nagi132/ping-pong-online)
-
 
 ## Executive Summary
 As the name suggests, Ping Pong Online is an interactive multiplayer ping pong web game. This application was made to be easily accessible so that anyone could play. With an online multiplayer option, users can connect with others and engage in a simple yet fun experience. The game is designed to be straightforward and intuitive so that anyone can easily pass the time with it. Users of this site should have fun with the game and feel relaxed while bonding with each other. Overall, this application is designed to be simple, intuitive, and quick to play, attracting individuals who might not consider themselves gamers but are looking for a fun and engaging way to take a break or connect with others.
@@ -32,19 +30,19 @@ As the name suggests, Ping Pong Online is an interactive multiplayer ping pong w
 
 ### Installation
 
-1. **Clone the repository**:
-    `git clone https://github.com/yourusername/ping-pong-online.git`
+1. **Clone the repository**:  
+    `git clone https://github.com/yourusername/ping-pong-online.git`  
     `cd ping-pong-online`
 
-2. **Install project dependencies:**:
+2. **Install project dependencies:**:  
     `npm install`
 
-3. **Create a .env file and set the port number**:
+3. **Create a .env file and set the port number**:  
     `PORT=3000`
 
 ### Run the Application
-- Start the app in development mode:
-    `npm run start-dev`
+- Start the app in development mode:  
+    `npm run start-dev`  
 Visit `http://localhost:3000/` to play the game.
 
 ## Ackowledgments
