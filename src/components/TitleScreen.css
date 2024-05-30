@@ -1,7 +1,7 @@
 .title-screen .App-background {
   /* opacity: 0.1; */
   background-image: url("../images/title.png");
-  background-color: rgba(0, 0, 139, 0.5);
+  background-color: rgba(119, 119, 150, 0.5);
   background-repeat: no-repeat;
   background-position: center;
   position: absolute;
