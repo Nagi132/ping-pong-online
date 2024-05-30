@@ -25,7 +25,7 @@ const Gameplay = () => {
     const mode = location.state?.mode || 'multiplayer';//default to multiplayer
     const urlRoomId = location.pathname.split('/')[2];
     const [roomId, setRoomId] = useState(urlRoomId);// get room id from url
-    const [isCPUmode, setIsCPUMode] = useState(mode === 'cpu');
+    const [isCPUmode] = useState(mode === 'cpu');
     const [winner, setWinner] = useState(false);
     // player scoring; winning score is 3
     const [player1Score, setPlayer1Score] = useState(0);
@@ -45,17 +45,17 @@ const Gameplay = () => {
     useEffect(() => {
         const countdownInterval = setInterval(updateCountdown, 1000);
         return () => clearInterval(countdownInterval); // Clear interval on component unmount
-    }, [ready]);
+    }, [ready, updateCountdown]);
 
     // Visibility on difficulty buttons
-    useEffect(() => {
-        const detectKeyDown = (e) => {
-            console.log("key clicked " + e.key);
-            console.log("pausing game now");
-            handlePause();
-        }
-        document.addEventListener('keydown', detectKeyDown, true)
-    }, [])
+    // useEffect(() => {
+    //     const detectKeyDown = (e) => {
+    //         console.log("key clicked " + e.key);
+    //         console.log("pausing game now");
+    //         handlePause();
+    //     }
+    //     document.addEventListener('keydown', detectKeyDown, true)
+    // }, [])
 
 
     useEffect(() => {
@@ -256,15 +256,14 @@ const Gameplay = () => {
     const buttonReplay = useRef();
 
     // frame counter
-    const [counter, setCounter] = useState(0);
+    const [counter,setCounter] = useState(0);
 
     // table width and height
     const TABLE_WIDTH = 1000;
     const TABLE_HEIGHT = 600;
 
     // paddles for player 1 and 2; constant paddle size
-    const [paddle1Y, setPaddle1Y] = useState(350);
-    //const [paddle2Y, setPaddle2Y] = useState(350);
+    const [paddle1Y] = useState(350);
     const PADDLE_HEIGHT = 100; //starts from top then adds to bottom
     const PADDLE_THICKNESS = 10;
 

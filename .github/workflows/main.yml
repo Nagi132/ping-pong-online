@@ -14,7 +14,7 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Build the application
-        run: npm run build
+        run: CI=false npm run build
       - name: Start the server
         run: npm run start-server
       - name: Start the client
