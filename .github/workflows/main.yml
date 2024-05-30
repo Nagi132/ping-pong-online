@@ -7,7 +7,7 @@ on:
 
 jobs:
   build-and-deploy:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -16,6 +16,6 @@ jobs:
       - name: Build the application
         run: CI=false npm run build
       - name: Start the server
-        run: npm run start-server
+        run: npm run start-server &
       - name: Start the client
         run: npm run start-client
