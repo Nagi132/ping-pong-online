@@ -32,7 +32,7 @@ As the name suggests, Ping Pong Online is an interactive multiplayer ping pong w
 
 1. **Clone the repository**:  
 ```sh
-git clone https://github.com/yourusername/ping-pong-online.git  
+git clone https://github.com/Nagi132/ping-pong-online.git  
 cd ping-pong-online
 ```
 
