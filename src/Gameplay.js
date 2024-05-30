@@ -268,24 +268,24 @@ const Gameplay = () => {
         if (winner) {
             setPlayer1Score(0);
             setPlayer2Score(0);
-            setWinner(false);
             num.dif = "off";
             activateCountdown(temp);
 
             socket.current.emit('requestReplay', roomId);
         }
-
+        setWinner(false);
     };
 
     const replayChangeDif = () => {
         if (winner) {
             setPlayer1Score(0);
             setPlayer2Score(0);
-            setWinner(false);
             num.dif = "off";
             setVisible(false);
+            activateCountdown(temp)
             socket.current.emit('requestReplay', roomId);
         }
+        setWinner(false);
     }
 
     const handlePause = () => {
@@ -294,7 +294,7 @@ const Gameplay = () => {
         if (!paused) {
             console.log("Game resumed with difficulty:", temp);
             setGameActive(true);
-            //setCountdownActive(true);
+            setCountdownActive(false);
         } else {
             temp = num.dif; // Save the current difficulty setting before pausing
             num.dif = "off";
@@ -433,7 +433,7 @@ const Gameplay = () => {
                         <button className="btn btn-green" onClick={() => activateCountdown('easy')}>Easy</button>
                         <button className="btn btn-orange" onClick={() => activateCountdown('normal')}>Normal</button>
                         <button className="btn btn-red" onClick={() => activateCountdown('hard')}>Hard</button>
-                        <p>(Press any button to pause the game)</p>
+                        {/* <p>(Press any button to pause the game)</p> */}
                     </div>
                 )}
             </div>
@@ -468,7 +468,7 @@ const Gameplay = () => {
 
             {/* pause buttons */}
 
-            {isCPUmode && !gameActive && (
+            {isCPUmode && gameActive && !visible && !winner && (
                 <div className="pause-buttons mt-5">
                     {!paused ? (
                         <button className='btn btn-purple lowered' onClick={handlePause}>Pause</button>
