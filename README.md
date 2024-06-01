@@ -1,6 +1,5 @@
 # Ping Pong Online
-![Build Status](https://github.com/Nagi132/ping-pong-online/actions/workflows/main.yml/badge.svg)
-
+[![Build and Deploy](https://github.com/Nagi132/ping-pong-online/actions/workflows/main.yml/badge.svg)](https://github.com/Nagi132/ping-pong-online/actions/workflows/main.yml)
 ## Executive Summary
 As the name suggests, Ping Pong Online is an interactive multiplayer ping pong web game. This application was made to be easily accessible so that anyone could play. With an online multiplayer option, users can connect with others and engage in a simple yet fun experience. The game is designed to be straightforward and intuitive so that anyone can easily pass the time with it. Users of this site should have fun with the game and feel relaxed while bonding with each other. Overall, this application is designed to be simple, intuitive, and quick to play, attracting individuals who might not consider themselves gamers but are looking for a fun and engaging way to take a break or connect with others.
 
