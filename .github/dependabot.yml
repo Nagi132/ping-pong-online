@@ -1,11 +1,11 @@
 version: 2
 updates:
   - package-ecosystem: "npm"
-    directory: "/" # Location of package.json
+    directory: "/" 
     schedule:
       interval: "daily"
       labels: "dependencies"
   - package-ecosystem: "github-actions"
     directory: .github/workflows
     schedule:
-      interval: "daily"
+      interval: "monthly"
