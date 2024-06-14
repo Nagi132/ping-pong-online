@@ -38,7 +38,7 @@ git clone https://github.com/Nagi132/ping-pong-online.git
 cd ping-pong-online
 ```
 
-3. **Install project dependencies:**:  
+3. **Install project dependencies**:  
 ```sh
 npm install
 ```
