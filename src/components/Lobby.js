@@ -16,7 +16,7 @@ function Lobby() {
 
     useEffect(() => {
         // Connect to the socket.io server
-        const newSocket = io(process.env.NODE_ENV === 'production' ? 'https://ping-pong-online.vercel.app/' : 'http://localhost:4000',
+        const newSocket = io(process.env.NODE_ENV === 'production' ? 'https://ping-pong-online.vercel.app' : 'http://localhost:4000',
         {
             withCredentials: true,
             transportOptions: {

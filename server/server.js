@@ -9,7 +9,7 @@ const server = http.createServer(app);
 
 // CORS setup
 const allowedOrigins = process.env.NODE_ENV === 'production'
-    ? ['https://ping-pong-online.vercel.app/']
+    ? ['https://ping-pong-online.vercel.app']
     : ['http://localhost:3000'];
 
 const corsOptions = {
