@@ -16,7 +16,7 @@
     "postcss": "^8.4.38",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.23.1",
+    "react-router-dom": "^6.25.1",
     "react-scripts": "^5.0.1",
     "resolve-url-loader": "^5.0.0",
     "socket.io": "^4.7.2",
